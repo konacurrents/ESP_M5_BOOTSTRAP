@@ -22,9 +22,26 @@
 		D265DD732E04AE640009B7AA /* ESP_M5_BOOTSTRAP */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ESP_M5_BOOTSTRAP; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D265DD922E04B0480009B7AA /* Exceptions for "ESP_M5_BOOTSTRAP" folder in "ESP_M5_BOOTSTRAP" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ESP_M5_BOOTSTRAP.ino,
+			);
+			target = D265DD722E04AE640009B7AA /* ESP_M5_BOOTSTRAP */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D265DD752E04AE640009B7AA /* ESP_M5_BOOTSTRAP */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D265DD922E04B0480009B7AA /* Exceptions for "ESP_M5_BOOTSTRAP" folder in "ESP_M5_BOOTSTRAP" target */,
+			);
+			explicitFileTypes = {
+				Defines.h = sourcecode.c.h;
+				ESP_M5_BOOTSTRAP.ino = sourcecode.cpp.cpp;
+			};
 			path = ESP_M5_BOOTSTRAP;
 			sourceTree = "<group>";
 		};
