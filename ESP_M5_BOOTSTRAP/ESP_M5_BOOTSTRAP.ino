@@ -7,10 +7,16 @@
 
 void loop()
 {
+	//! loop
    loop_mainModule();
 }
 
 void setup()
 {
-   loop_mainModule();
+   Serial.begin(115200);
+   SerialDebug.println();
+   SerialDebug.println(VERSION);
+
+	//! setup
+   setup_mainModule();
 }

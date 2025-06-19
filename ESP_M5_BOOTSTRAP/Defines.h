@@ -24,11 +24,8 @@
 #define VERSION "2025d_4.4V(1.0a)-8.30.24-M5_ATOM_S3"
 #else
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
-#define VERSION "v6_15_25(5.6b)-ATOM_QRSensorsClassSendCMD_StopMotorOnStartup"
+#define VERSION "v6_19_25(1.0a)-BOOTSTRAP_OTA"
 
-//#define VERSION "v5_21-25(5.15d)-ATOM_L9110S_SensorsClassSendCMD_feedOnStartup"
-//#define VERSION "v5_6-25(5.2b)-ATOMClass_HDriver"
-//#define VERSION "2025d_4.14-25(4.6c)-ATOM_MOTOR_SERVo_QR_SCAN_DOCFOLLOW_SOCKET_SCANNED_SM_BUTTON"
 #endif //ESP_M5_ATOM_S3
 
 #define ESP_M5

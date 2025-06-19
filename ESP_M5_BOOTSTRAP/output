@@ -1,5 +1,5 @@
-Sketch uses 387970 bytes (29%) of program storage space. Maximum is 1310720 bytes.
-Global variables use 18408 bytes (5%) of dynamic memory, leaving 309272 bytes for local variables. Maximum is 327680 bytes.
+Sketch uses 391398 bytes (29%) of program storage space. Maximum is 1310720 bytes.
+Global variables use 18488 bytes (5%) of dynamic memory, leaving 309192 bytes for local variables. Maximum is 327680 bytes.
 
 [92mUsed library[0m [92mVersion[0m [90mPath[0m                                                                               
 [93mM5StickCPlus[0m 0.0.8   [90m/Users/scott/Documents/Arduino/libraries/M5StickCPlus[0m                              
