@@ -68,9 +68,40 @@ void setup_mainModule()
 #ifdef TEST_JSON
     setup_JSON_Module();
 #endif
-    strcpy(_ssid,(char*)"");
-    strcpy(_password, (char*)"");
+    
+#pragma mark HARDCODE -- MODIFY THIS TO MAKE IT EASIER
+    strcpy(_ssid,(char*)"SSID");
+    strcpy(_password, (char*)"PASSWORD");
 }
+
+//! uses the SSID and PASSWORD
+void tryConnect()
+{
+    int count = 0;
+    SerialDebug.printf("Trying Connection: %s, %s\n", _ssid, _password);
+
+    //!setup the WIFI.begin
+    setupWIFI(_ssid, _password);
+    
+    //! check status
+    while (count < 10 && WiFi.status() != WL_CONNECTED)
+    {
+        delay(1000);
+        Serial.print(".");
+        count ++;
+    }
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        SerialDebug.println("\n*** Try again with new values");
+    }
+    else
+    {
+        SerialDebug.println("**** CONNECTED ****");
+        //String s = get_WIFIInfoString();
+    }
+}
+
+//! main loop
 void loop_mainModule()
 {
     //! see if data on the serial input
@@ -86,8 +117,10 @@ void loop_mainModule()
             SerialDebug.println("Boostrap OTA, type one of the following:");
             SerialDebug.println("WIFI INFO:");
             SerialDebug.println("ssid:<ssid>");
-            SerialDebug.println("wifi:<password>");
-            SerialDebug.println("status");
+            SerialDebug.println("wifi:<password>  -- this will try to connect");
+            SerialDebug.println("connect -- try to connect");
+
+            SerialDebug.println("status  -- shows status");
             SerialDebug.println("r - reboot");
 
             
@@ -127,33 +160,19 @@ void loop_mainModule()
             String subset = command.substring(colon+1);
             strcpy(_ssid, subset.c_str());
         }
+        else if (command.startsWith("connect"))
+        {
+            tryConnect();
+        }
         else if (command.startsWith("wifi:"))
         {
-            int count = 0;
             //String subset = "sunny2021";
             int colon = command.indexOf(":");
             String subset = command.substring(colon+1);
             strcpy(_password,  subset.c_str());
             
-            //!setup the WIFI.begin
-            setupWIFI(_ssid, _password);
-            
-            //! check status
-            while (count < 10 && WiFi.status() != WL_CONNECTED)
-            {
-                delay(1000);
-                Serial.print(".");
-                count ++;
-            }
-            if (WiFi.status() != WL_CONNECTED)
-            {
-                SerialDebug.println("\n*** Try again with new values");
-            }
-            else
-            {
-                SerialDebug.println("**** CONNECTED ****");
-                //String s = get_WIFIInfoString();
-            }
+            //! try connecting
+            tryConnect();
         }
         else if (command == "m5atom")
         {
