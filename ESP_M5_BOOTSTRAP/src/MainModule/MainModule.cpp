@@ -1,9 +1,9 @@
 #include "MainModule.h"
 
-#include <iostream>
-#include <string_view>
+//#include <iostream>
+//#include <string_view>
 #include <string>
-#include <HTTPClient.h>
+//#include <HTTPClient.h>
 #include <WiFi.h>
 
 //!The WIFI client
@@ -90,6 +90,10 @@ void loop_mainModule()
             
             SerialDebug.println("m5atom");
             // SerialDebug.println("m5");
+#ifdef TEST_JSON
+            SerialDebug.println("jsonAdd:name,mapping");
+            SerialDebug.println("jsonLookup:name");
+#endif
         }
         else if (command.startsWith("status"))
         {
@@ -141,6 +145,30 @@ void loop_mainModule()
             //!retrieves from constant location
             performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin");
         }
+       
+#ifdef TEST_JSON
+        else if (command.startsWith("jsonAdd:"))
+        {
+            SerialDebug.println("jsonAdd:name,mapping");
+            int colon = command.indexOf(":");
+            String subset = command.substring(colon+1);
+            int comma = subset.indexOf(",");
+            String name = subset.substring(0,comma-1);
+            String mapping = subset.substring(comma+1);
+            //! call addMapping
+            addMapping2(name.c_str(), mapping.c_str());
+        }
+        else if (command.startsWith("jsonLookup:"))
+        {
+            SerialDebug.println("jsonLookup:name");
+            int colon = command.indexOf(":");
+            String subset = command.substring(colon+1);
+            //! call getMapping
+            char *mapping = getMapping2(subset.c_str());
+            //! print result
+            SerialDebug.printf("Mapping = %s\n", mapping);
+        }
+#endif
         else
         {
             SerialDebug.printf("*** Unnown Command: %s\n", command);

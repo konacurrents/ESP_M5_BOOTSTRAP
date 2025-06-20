@@ -8,6 +8,9 @@
 #ifndef Defines_h
 #define Defines_h
 
+//! turn off to minimize
+//#define TEST_JSON
+
 //! 4. M5 Atom  This includes QR and Socket
 #define ESP_M5_ATOM_LITE
 //! 1.5.24 NOW the M5AtomLite is all the ATOM's but configured to 1 at a time
@@ -138,6 +141,7 @@
 //#define BOOTSTRAP_CLEAN
 
 #include "src/MainModule/MainModule.h"
+#include "src/JSONModule/JSON_Module.h"
 
 #ifdef USE_MQTT_NETWORKING
 //#include "src/MQTTModule/MQTTNetworking.h"
