@@ -1,10 +1,10 @@
 #include "MainModule.h"
 
-//#include <iostream>
-//#include <string_view>
 #include <string>
 //#include <HTTPClient.h>
 #include <WiFi.h>
+#include <WiFiClient.h>
+
 
 //!The WIFI client
 WiFiClient _espClient;
@@ -65,6 +65,11 @@ char *wifiStatus_MQTT()
 void setup_mainModule()
 {
     SerialDebug.println("**** type on the serial monitor. Start with 'help'  ****");
+#ifdef TEST_JSON
+    setup_JSON_Module();
+#endif
+    strcpy(_ssid,(char*)"");
+    strcpy(_password, (char*)"");
 }
 void loop_mainModule()
 {
@@ -83,7 +88,8 @@ void loop_mainModule()
             SerialDebug.println("ssid:<ssid>");
             SerialDebug.println("wifi:<password>");
             SerialDebug.println("status");
-            
+            SerialDebug.println("r - reboot");
+
             
             SerialDebug.println();
             SerialDebug.println("OTA UPDATE:");
@@ -91,19 +97,31 @@ void loop_mainModule()
             SerialDebug.println("m5atom");
             // SerialDebug.println("m5");
 #ifdef TEST_JSON
+            SerialDebug.println();
+            SerialDebug.println("** JSON Array Testing **");
             SerialDebug.println("jsonAdd:name,mapping");
             SerialDebug.println("jsonLookup:name");
+            SerialDebug.println("jsonMappings");
+            SerialDebug.println("jsonPersist"); //  writes to memory....
+            SerialDebug.println("jsonInit"); //  reads from memory....
+
 #endif
         }
         else if (command.startsWith("status"))
         {
+            SerialDebug.printf("ssid=%s, wifi=%s\n", _ssid, _password);
             SerialDebug.println(wifiStatus_MQTT());
             String get_WIFIInfoString();
+        }
+        else if (command.startsWith("r"))
+        {
+            SerialDebug.println("REBOOT");
+            //reboot
+            ESP.restart();
         }
         //! https://docs.arduino.cc/language-reference/en/variables/data-types/stringObject/Functions/startsWith/
         else if (command.startsWith("ssid:"))
         {
-            SerialDebug.println("SSID");
             //String subset = "SunnyWhiteriver";
             int colon = command.indexOf(":");
             String subset = command.substring(colon+1);
@@ -112,7 +130,6 @@ void loop_mainModule()
         else if (command.startsWith("wifi:"))
         {
             int count = 0;
-            SerialDebug.println("PASSWORD");
             //String subset = "sunny2021";
             int colon = command.indexOf(":");
             String subset = command.substring(colon+1);
@@ -121,6 +138,7 @@ void loop_mainModule()
             //!setup the WIFI.begin
             setupWIFI(_ssid, _password);
             
+            //! check status
             while (count < 10 && WiFi.status() != WL_CONNECTED)
             {
                 delay(1000);
@@ -134,8 +152,7 @@ void loop_mainModule()
             else
             {
                 SerialDebug.println("**** CONNECTED ****");
-                String get_WIFIInfoString();
-                
+                //String s = get_WIFIInfoString();
             }
         }
         else if (command == "m5atom")
@@ -149,24 +166,41 @@ void loop_mainModule()
 #ifdef TEST_JSON
         else if (command.startsWith("jsonAdd:"))
         {
-            SerialDebug.println("jsonAdd:name,mapping");
+            //SerialDebug.println("jsonAdd:name,mapping");
             int colon = command.indexOf(":");
             String subset = command.substring(colon+1);
             int comma = subset.indexOf(",");
-            String name = subset.substring(0,comma-1);
+            String name = subset.substring(0,comma);
+            char *nameC = (char*) name.c_str();
             String mapping = subset.substring(comma+1);
+            char *mappingC = (char*)mapping.c_str();
+            //! strip spaces.. TODO
+            
             //! call addMapping
-            addMapping2(name.c_str(), mapping.c_str());
+            addMapping(nameC, mappingC);
         }
         else if (command.startsWith("jsonLookup:"))
         {
-            SerialDebug.println("jsonLookup:name");
+            //SerialDebug.println("jsonLookup:name");
             int colon = command.indexOf(":");
             String subset = command.substring(colon+1);
+            char *nameC = (char*)subset.c_str();
             //! call getMapping
-            char *mapping = getMapping2(subset.c_str());
+            char *mapping = getMapping(nameC);
             //! print result
             SerialDebug.printf("Mapping = %s\n", mapping);
+        }
+        else if (command.startsWith("jsonMappings"))
+        {
+            showMappings();
+        }
+        else if (command.startsWith("jsonPersist"))
+        {
+            jsonPersist();
+        }
+        else if (command.startsWith("jsonInit"))
+        {
+            jsonInit();
         }
 #endif
         else

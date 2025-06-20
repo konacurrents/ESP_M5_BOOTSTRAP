@@ -27,7 +27,8 @@
 #define VERSION "2025d_4.4V(1.0a)-8.30.24-M5_ATOM_S3"
 #else
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
-#define VERSION "v6_19_25(1.0a)-BOOTSTRAP_OTA"
+
+#define VERSION "v6_20_25(2.0e)-BOOTSTRAP_JSON_OTA"
 
 #endif //ESP_M5_ATOM_S3
 
