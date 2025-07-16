@@ -45,7 +45,7 @@ We are using [kttp://KnowledgeShark.org](http://KnowledgeShark.org) for this.
 
 # Plug an play
 
-```objc
+```c
 #ifdef USE_MQTT_NETWORKING
 #include "src/MQTTModule/MQTTNetworking.h"
 #endif
@@ -99,7 +99,7 @@ void setup()
 
 And the main loop of the executable (from the Arduino runtime).
 
-```objc
+```c
 //! main loop of the executable
 void loop()
 {
@@ -133,7 +133,7 @@ Since this is for the ESP chips, the information is stored internally in the EPR
 
 ## Header of MQTTNetwork
 
-```objc
+```c
 
 #define MQTTNetworking
 
@@ -163,7 +163,7 @@ int processJSONMessage(char *message);
 ## Example
 
 To use the MQTTNetwork module, the same setup and loop of the main application is used, but in that loop are calls to:
-```objc
+```c
 setupMQTTNetworking()
 
 loopMQTTNetworking()
@@ -172,7 +172,7 @@ loopMQTTNetworking()
 ## Callbacks
 
 Some operations need to be handled in the calling application, such as feeding the dog or retrieving the temperature. These are handled in callback functions. These should be called before the setup is called.
-```objc
+```c
 
     //register the 2 callbacks for now..
     registerCallback(MQTT_CALLBACK_FEED, &feedMessageCallback);
@@ -181,7 +181,7 @@ Some operations need to be handled in the calling application, such as feeding t
 
 These are defined as methods with a single message parameter. This message will be what was seen on the network and processed by the message process (eg. processBarkletMessage())
 
-```objc
+```c
 //!example callback: but the scope would have the pCharacteristic defined, etc..
 //!This is pased just before the setupMQTTNetworking() is called..
 void feedMessageCallback(char *message)
@@ -205,7 +205,7 @@ void blinkMessageCallback(char *message)
 
 Since the device must be configured, the processJSONMesage() is called when a bluetooth message arrives (or other ways the information is gathered). This returns a boolan stating which if true means the message was processed, otherwise the caller does what it wants with the bluetooth message.
 
-```objc
+```c
 //!process the JSON message, which can be configuration information. This is called from outside on things like a Bluetooth message..
 //!return true if valid JSON, and false otherwise. This looks for '{'
 int processJSONMessage(char *message);
@@ -236,7 +236,7 @@ int processJSONMessage(char *message);
 In testing, or otherwise bootstrapping the device, a BOOTSTRAP ifdef is used.
 
 
-```objc
+```c
 #define BOOTSTRAP
 #ifdef BOOTSTRAP
     //note: this could be a 'rebootstrap' message via MQTT .. in the future..
@@ -280,7 +280,7 @@ In testing, or otherwise bootstrapping the device, a BOOTSTRAP ifdef is used.
 
 ## Header of BLEServerNetworking
 
-```objc
+```c
 #define BLEServerNetworking
 
 //!defines the operations on BLE Server Networking
@@ -311,7 +311,7 @@ void sendBLEMessageACKMessage();
 ## Example
 
 To use the MQTTNetwork module, the same setup and loop of the main application is used, but in that loop are calls to:
-```objc
+```c
   setupBLEServerNetworking("PTFeeder", getDeviceName(), PT_SERVICE_UUID, PT_CHARACTERISTIC_UUID);
 
    loopBLEServerNetworking()
@@ -319,7 +319,7 @@ To use the MQTTNetwork module, the same setup and loop of the main application i
 
 ## Callbacks
 
-```objc
+```c
 
  //*** The callback for "onWrite" of the bluetooth "onWrite'
   registerCallbackBLEServer(BLE_SERVER_CALLBACK_ONWRITE, &onWriteBLEServerCallback);
@@ -329,7 +329,7 @@ To use the MQTTNetwork module, the same setup and loop of the main application i
 
 ## Header of BLEClientNetworking
 
-```objc
+```c
 #define BLEClientNetworking
 
 #define BLE_CLIENT_CALLBACK_ONREAD 0
@@ -354,7 +354,7 @@ void sendFeedCommandBLEClient();
 
 ## Example
 
-```objc
+```c
     registerCallbackBLEClient(BLE_CLIENT_CALLBACK_BLINK_LIGHT, &blinkBlueLight);
     setupBLEClientNetworking((char*)"PTFeeder",(char*) SERVICE_UUID, (char*) CHARACTERISTIC_UUID );
 
@@ -362,14 +362,14 @@ void sendFeedCommandBLEClient();
 ```
 ## Callbacks
 
-```objc
+```c
     registerCallbackBLEClient(BLE_CLIENT_CALLBACK_BLINK_LIGHT, &blinkBlueLight);
 ```
 
 
 ## BNF Grammer for Barklet Language
 
-```objc
+```c
 /*
  * @discussion
  * Description = Grammer for Barklet communication
