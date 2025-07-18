@@ -19,8 +19,13 @@ WiFiClient _espClient;
  
  */
 
+//! globals for WIFI
 char _ssid[100];
 char _password[100];
+
+//! #4 specify host and bin
+char _hostOTA[100];
+char _binOTA[200];
 
 void setupWIFI(char *arg_ssid, char* arg_password)
 {
@@ -72,6 +77,11 @@ void setup_mainModule()
 #pragma mark HARDCODE -- MODIFY THIS TO MAKE IT EASIER
     strcpy(_ssid,(char*)"SSID");
     strcpy(_password, (char*)"PASSWORD");
+    
+    //! let user modify these..
+    strcpy(_hostOTA,(char*)"http://KnowledgeShark.org");
+    strcpy(_binOTA, (char*)"OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin");
+        
 }
 
 //! uses the SSID and PASSWORD
@@ -112,7 +122,7 @@ void loop_mainModule()
         
         SerialDebug.println(command);
         
-        if (command == "help")
+        if (command == "help" || command == ".")
         {
             SerialDebug.println("Boostrap OTA, type one of the following:");
             SerialDebug.println("WIFI INFO:");
@@ -122,12 +132,22 @@ void loop_mainModule()
 
             SerialDebug.println("status  -- shows status");
             SerialDebug.println("r - reboot");
+            SerialDebug.println("help");
+            SerialDebug.println(". (also help)");
 
             
             SerialDebug.println();
             SerialDebug.println("OTA UPDATE:");
             
             SerialDebug.println("m5atom");
+            
+            SerialDebug.println();
+            SerialDebug.println("Specify OTA");
+            SerialDebug.println("hostOTA:<url>");
+            SerialDebug.println("binOTA:<bin name>");
+            SerialDebug.println("grabOTA -- perform OTA");
+
+
             // SerialDebug.println("m5");
 #ifdef TEST_JSON
             SerialDebug.println();
@@ -145,6 +165,10 @@ void loop_mainModule()
             SerialDebug.printf("ssid=%s, wifi=%s\n", _ssid, _password);
             SerialDebug.println(wifiStatus_MQTT());
             String get_WIFIInfoString();
+            
+            SerialDebug.println(" Specify OTA Host/Bin");
+            SerialDebug.printf("hostOTA=%s, binOTA:%s\n", _hostOTA, _binOTA);
+
         }
         else if (command.startsWith("r"))
         {
@@ -180,6 +204,29 @@ void loop_mainModule()
             
             //!retrieves from constant location
             performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin");
+        }
+        
+        //! 7.18.25
+        else if (command.startsWith("hostOTA:"))
+        {
+            int colon = command.indexOf(":");
+            String subset = command.substring(colon+1);
+            //!retrieves from constant location
+            strcpy(_hostOTA, subset.c_str());
+        }
+        else if (command.startsWith("binOTA:"))
+        {
+            int colon = command.indexOf(":");
+            String subset = command.substring(colon+1);
+            //!retrieves from constant location
+            strcpy(_binOTA, subset.c_str());
+        }
+        else if (command.startsWith("grabOTA"))
+        {
+            SerialDebug.printf(" *** performing custome OTA Update: %s/%s", _hostOTA, _binOTA);
+            
+            //!retrieves from constant location
+            performOTAUpdate(_hostOTA, _binOTA);
         }
        
 #ifdef TEST_JSON

@@ -23,14 +23,11 @@
 //! 2.25.23 Sketch uses 1497093 bytes (76%) of program storage space. Maximum is 1966080 bytes.
 //! 8.22.24 (seems to generate m5stack_stickc_plus.bin)   .. and size now 65%
 #ifdef ESP_M5_ATOM_LITE
-#ifdef ESP_M5_ATOM_S3
-#define VERSION "2025d_4.4V(1.0a)-8.30.24-M5_ATOM_S3"
-#else
+
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
 
-#define VERSION "v6_20_25(2.0e)-BOOTSTRAP_JSON_OTA"
+#define VERSION "v7_18_25(2.2e)-BOOTSTRAP_JSON_OTA"
 
-#endif //ESP_M5_ATOM_S3
 
 #define ESP_M5
 #define M5_ATOM
