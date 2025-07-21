@@ -7,3 +7,4 @@ compileM5Atom:
 # This requires premission to upload to a foreign web location
 uploadBootstrap:
 	scp -i ~/.ssh/idogwatch_001.pem ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin ec2-user@knowledgeshark.me:html/KnowledgeShark.org/OTA/Bootstrap
+	mv ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin.save
