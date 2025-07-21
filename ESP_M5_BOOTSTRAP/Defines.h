@@ -26,7 +26,7 @@
 
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
 
-#define VERSION "v7_18_25(2.2e)-BOOTSTRAP_JSON_OTA"
+#define VERSION "v7_21_25(2.3b)-BOOTSTRAP_JSON_OTA_NTP"
 
 
 #define ESP_M5
