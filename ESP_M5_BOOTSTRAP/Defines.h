@@ -8,74 +8,26 @@
 #ifndef Defines_h
 #define Defines_h
 
+//! ******* UPDATE THESE ********
+#define SSID_NAME "SunnyWhiteriver"
+#define SSID_PASSWORD "sunny2021"
+
+//! uncomment if you want to have SSID saved in EPROM
+//#define SAVE_SSID_IN_EPROM
+#define ESP_M5
+
+
 //! turn off to minimize
 //#define TEST_JSON
 
-//! 4. M5 Atom  This includes QR and Socket
-#define ESP_M5_ATOM_LITE
-//! 1.5.24 NOW the M5AtomLite is all the ATOM's but configured to 1 at a time
-//This is an easy way to turn on the smart clicker configuration...
-//! https://docs.m5stack.com/en/atom/atomic_qr
-//! library:  not using M5Stack-ATOM (actually using M5Stick-C-Plus)
-//! 12.26.23 day after xmas
-//! https://docs.m5stack.com/en/atom/atom_socket
-//! ALSO: use the Minimal SPIFF, 1.9m app, OTA and 190KB spiff
-//! 2.25.23 Sketch uses 1497093 bytes (76%) of program storage space. Maximum is 1966080 bytes.
-//! 8.22.24 (seems to generate m5stack_stickc_plus.bin)   .. and size now 65%
-#ifdef ESP_M5_ATOM_LITE
 
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
 
-#define VERSION "v7_21_25(2.3b)-BOOTSTRAP_JSON_OTA_NTP"
+#define VERSION "v7_25_25(2.3b)-BOOTSTRAP_JSON_OTA_NTP"
 
-
-#define ESP_M5
-#define M5_ATOM
+//! for OTA
 #define USE_MQTT_NETWORKING
-//#define USE_BUTTON_MODULE  ... ATOMQButtons.cpp
-#define USE_WIFI_AP_MODULE
-#define USE_BLE_SERVER_NETWORKING
-#define USE_BLE_CLIENT_NETWORKING //try to be a smart clicker too..
-//#define USE_DISPLAY_MODULE  .. no display
 
-#define USE_STEPPER_MODULE
-#define USE_UI_MODULE
-
-//! 5.21.25 adding feed_on_startup .. as the M5Atom is powering the 
-//! motor before we can talk to it.. so this will at least shorten that issue
-#define FEED_ON_STARTUP
-
-//! which ATOM plugs MODULEs are included in build:
-#define ATOM_QRCODE_MODULE
-//! including ATOM_SOCKET_MODULE now ...
-#define ATOM_SOCKET_MODULE
-//#else
-
-//! the ATOM uses FAST_LED (the light on top button, but not M5AtomS3)
-#define USE_FAST_LED
-
-//! Sensors:  2.8.24 (30K above pacific)
-#define KEY_UNIT_SENSOR_CLASS
-#define USE_LED_BREATH
-//! 11.14.23 try "https" secure web call (to SemanticMarker.org/bot/...)
-//!  See https://GitHub.com/konacurrents/SemanticMarkerAPI for more info
-//crashing .. 3.22.24 (just send DOCFOLLOW for now)
-//#define USE_REST_MESSAGING
-//! 3.25.24 try again ... (not working)
-
-
-//! 4.4.24 (after glacier skiing at Crystal ice, but snowing) -- year ago now 4.4.25 (yesterday good. Today would have been amazing views)
-#define USE_SPIFF_MODULE
-#define USE_SPIFF_MQTT_SETTING
-#define USE_SPIFF_QRATOM_SETTING
-
-
-//! 4.10.24 GPS sensor
-//#define USE_GPS_SENSOR_CLASS
-
-//#endif // not M5AtomS3
-
-#endif //ESP_M5_ATOM_LITE
 
 //https://forum.arduino.cc/t/single-line-define-to-disable-code/636044/4
 // Turn on/off Serial printing being included in the executable

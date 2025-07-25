@@ -23,6 +23,9 @@ NTPClient *_timeClient; //(_ntpUDP, "pool.ntp.org", 36000, 60000);
 //!The WIFI client
 WiFiClient _espClient;
 
+//! uses the SSID and PASSWORD
+void tryConnect();
+
 /*
  Set: otafile, Val: http://KnowledgeShark.org/OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin
  main_dispatchAsyncCommandWithString:1: http://KnowledgeShark.org/OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin
@@ -51,6 +54,8 @@ void setupWIFI(char *arg_ssid, char* arg_password)
     WiFi.mode(WIFI_STA);
     WiFi.begin(arg_ssid, arg_password);
     SerialDebug.printf("WiFi.begin(%s,%s)\n", arg_ssid, arg_password);
+   
+
 }
 
 String _WIFIInfoString;
@@ -90,8 +95,12 @@ char *wifiStatus_MQTT()
 #include <Preferences.h>
 //!name of main prefs eprom
 #define PREFERENCES_EPROM_MAIN_NAME "MainPrefs"
+#ifdef SAVE_SSID_IN_EPROM
 #define PREFERENCES_SSID "SSID"
 #define PREFERENCES_WIFI "WIFI"
+#else
+//! use the SSID_NAME and SSID_PASSWORD from the defines.h
+#endif
 char _preferenceBuffer[100];
 
 //! preferences for MAIN
@@ -127,13 +136,21 @@ void setup_mainModule()
 #endif
     
 #pragma mark HARDCODE -- MODIFY THIS TO MAKE IT EASIER
+    
+#ifdef SAVE_SSID_IN_EPROM
     strcpy(_ssid,getPreference((char*)PREFERENCES_SSID));
     strcpy(_wifiPassword, getPreference((char*)PREFERENCES_WIFI));
-    
+#else
+    //! use values from defines.h
+    strcpy(_ssid,SSID_NAME);
+    strcpy(_wifiPassword, SSID_PASSWORD);
+#endif
     //! let user modify these..
     strcpy(_hostOTA,(char*)"http://KnowledgeShark.org");
     strcpy(_binOTA, (char*)"OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin");
-        
+    
+    //! try to connect
+    tryConnect();
 }
 
 //! uses the SSID and PASSWORD
@@ -224,6 +241,12 @@ void loop_mainModule()
             getTimeStamp_mainModule();
             
             SerialDebug.println("Boostrap OTA, type one of the following:");
+            SerialDebug.println();
+            SerialDebug.println(VERSION);
+            SerialDebug.println();
+
+            SerialDebug.println("type one of the following:");
+
             SerialDebug.println("   status  -- shows status");
 
             SerialDebug.println("   r - reboot");
@@ -300,8 +323,10 @@ void loop_mainModule()
             int colon = command.indexOf(":");
             String subset = command.substring(colon+1);
             strcpy(_ssid, subset.c_str());
+#ifdef SAVE_SSID_IN_EPROM
             //! save in EPROM
             savePreference((char*)PREFERENCES_SSID, (char*)_ssid);
+#endif
         }
         else if (command.startsWith("connect"))
         {
@@ -309,14 +334,14 @@ void loop_mainModule()
         }
         else if (command.startsWith("wifi:"))
         {
-            //String subset = "sunny2021";
             int colon = command.indexOf(":");
             String subset = command.substring(colon+1);
             strcpy(_wifiPassword,  subset.c_str());
             
+#ifdef SAVE_SSID_IN_EPROM
             //! save in EPROM
             savePreference((char*)PREFERENCES_WIFI, (char*)_wifiPassword);
-            
+#endif
             //! try connecting
             tryConnect();
         }
