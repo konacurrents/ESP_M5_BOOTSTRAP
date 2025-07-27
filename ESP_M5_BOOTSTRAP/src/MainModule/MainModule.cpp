@@ -62,7 +62,18 @@ String _WIFIInfoString;
 //! retrieve the WIFIInfoString
 String get_WIFIInfoString()
 {
+    return "WIFI";
+    
     long rssi = WiFi.RSSI();
+    /*
+     ???????
+     Decoding stack results
+     0x400d8e3d: String::operator=(char const*) at /Users/scott/Library/Arduino15/packages/m5stack/hardware/esp32/2.1.1/cores/esp32/WString.cpp line 290
+     0x400d316a: get_WIFIInfoString() at /Users/scott/Library/Arduino15/packages/m5stack/hardware/esp32/2.1.1/cores/esp32/IPAddress.h line 61
+     0x400d350f: loop_mainModule() at /Users/scott/Documents/GitHub/ESP_M5_Bootstrap/ESP_M5_BOOTSTRAP/ESP_M5_BOOTSTRAP/src/MainModule/MainModule.cpp line 283
+     0x400d28b7: loop() at /Users/scott/Documents/GitHub/ESP_M5_Bootstrap/ESP_M5_BOOTSTRAP/ESP_M5_BOOTSTRAP/ESP_M5_BOOTSTRAP.ino line 11
+     0x400d93ad: loopTask(void*) at /Users/scott/Library/Arduino15/packages/m5stack/hardware/esp32/2.1.1/cores/esp32/main.cpp line 50
+     */
     
     _WIFIInfoString = "IP Address: " + WiFi.localIP();
     _WIFIInfoString += "\n WIFI SSID" + String(WiFi.SSID());
