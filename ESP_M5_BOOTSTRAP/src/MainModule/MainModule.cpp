@@ -412,19 +412,20 @@ void loop_mainModule()
             //!retrieves from constant location
             performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/Bootstrap/ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin");
         }
-        else if (command.startsWith("m5atom") || command.startsWith("5"))
-        {
-            SerialDebug.println(" *** performing m5atom OTA Update");
-            
-            //!retrieves from constant location
-            performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin");
-        }
+      //! must be first..
         else if (command.startsWith("m5atomDaily") || command.startsWith("6"))
         {
             SerialDebug.println(" *** performing m5atom OTA Update - DAILY");
             
             //!retrieves from constant location
             performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/TEST/M5Atom/daily/ESP_IOT.ino.m5stick_c_plus.bin");
+        }
+        else if (command.startsWith("m5atom") || command.startsWith("5"))
+        {
+            SerialDebug.println(" *** performing m5atom OTA Update");
+            
+            //!retrieves from constant location
+            performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin");
         }
         //! 7.18.25
         else if (command.startsWith("hostOTA:"))
