@@ -217,6 +217,44 @@ int getTimeStamp_mainModule()
     return now;
 }
 
+//! show partition schemes
+void showPartitioSchemes()
+{
+    SerialDebug.println();
+    SerialDebug.println(" *** PARTITION INFO ***");
+    SerialDebug.println("(4) m5Atom:");
+    SerialDebug.println("  Board: M5StickCPlus");
+    SerialDebug.println("  Partition: 'Minimal SPIFFS, (1.9MB App 1.9MB OTA)'");
+    SerialDebug.println("  Defines.h(4)  #ESP_M5_ATOM_LITE");
+    SerialDebug.println("(1) M5 (red one):");
+    SerialDebug.println("  Board: M5StickCPlus");
+    SerialDebug.println("  ****Partition INSTALLED BASE: 'default'");
+    SerialDebug.println("  Defines.h(1)  #ESP_M5_SMART_CLICKER_CONFIGURATION");
+    SerialDebug.println("(3) ESP_32_FEEDER (installed base):");
+    SerialDebug.println("  Board: ESP32 Dev Module");
+    SerialDebug.println("  Partition: 'default'");
+    SerialDebug.println("  Defines.h(3)  #ESP_32_FEEDER_WITH_BOARD");
+    SerialDebug.println("(5) M5_CAMERA:");
+    SerialDebug.println("  Board: M5StickCPlus");
+    SerialDebug.println("  Partition: 'Minimal SPIFFS, (1.9MB App 1.9MB OTA)'");
+    SerialDebug.println("  Defines.h(5)  #ESP_M5_CAMERA");
+    SerialDebug.println("(6) M5 Core2:");
+    SerialDebug.println("  Board: M5Core2");
+    SerialDebug.println("  Partition: 'Minimal SPIFFS, (1.9MB App 1.9MB OTA)'");
+    SerialDebug.println("  Defines.h(6)  #M5CORE2_MODULE");
+    SerialDebug.println("(7) m5AtomS3:");
+    SerialDebug.println("  Board: M5AtomS3");
+    SerialDebug.println("  Defines.h(7)  #ESP_M5_ATOM_S3");
+    SerialDebug.println("  Partition: 'Minimal SPIFFS, (1.9MB App 1.9MB OTA)'");
+    
+    SerialDebug.println("(8) M5StickCPLUS2 - Yellow version:");
+    SerialDebug.println("  Board: M5StickCPlus2 - uses M5.Unified");
+    SerialDebug.println("  Defines.h(7)  #M5STICKCPLUS2");
+    SerialDebug.println("  Partition: 'Minimal SPIFFS, (1.9MB App 1.9MB OTA)'");
+    
+    
+}
+
 //! main loop
 void loop_mainModule()
 {
@@ -225,13 +263,13 @@ void loop_mainModule()
     {
         _timeClient->update();
         
-//        _timeClient->getDay()
-//        _timeClient-> getHours()
-//        _timeClient-> getMinutes()
-//        _timeClient-> getSeconds()
-
+        //        _timeClient->getDay()
+        //        _timeClient-> getHours()
+        //        _timeClient-> getMinutes()
+        //        _timeClient-> getSeconds()
+        
         //! set the time in the TimeLib.h
-       // setTime(_timeClient->getEpochTime());
+        // setTime(_timeClient->getEpochTime());
         
     }
     
@@ -255,44 +293,51 @@ void loop_mainModule()
             SerialDebug.println();
             SerialDebug.println(VERSION);
             SerialDebug.println();
-
+            
             SerialDebug.println("type one of the following:");
-
+            
             SerialDebug.println("   status  -- shows status");
-
+            
             SerialDebug.println("   r - reboot");
             SerialDebug.println("   help");
             SerialDebug.println("   . (also help)");
             SerialDebug.println();
-
+            
             SerialDebug.println(" **** WIFI INFO ****");
             SerialDebug.println("    ** enter 'ssid:<ssid>' etc");
-
+            
             SerialDebug.printf( "   ssid:%s\n", _ssid);
             SerialDebug.printf( "   wifi:%s\n", _wifiPassword);
             SerialDebug.println("   connect -- try to connect");
             SerialDebug.println("   NTP Time -- get current time");
-
+            
             SerialDebug.println();
             SerialDebug.println(" **** OTA UPDATE ***");
+            SerialDebug.println("   partition  -> show partition schemes");
+            SerialDebug.println();
             SerialDebug.println("   bootstrap - this program");
-
-            SerialDebug.println("   m5atom");
-            SerialDebug.println("   m5atomDaily");
+            
+            SerialDebug.println("   m5atom  (or 5)");
+            SerialDebug.println("   m5atomDaily (or 6)");
+            SerialDebug.println();
+            SerialDebug.println("   m5atomS3 - the one with display");
+            SerialDebug.println("   m5camera - the one with camera");
+            SerialDebug.println("   m5Core2 - the CORE2");
+            SerialDebug.println("   m5 - the red one");
+            SerialDebug.println("   m5stickCplus2 - the yellow one");
 
             SerialDebug.println();
             SerialDebug.println(" *** Specify OTA manually ***");
             SerialDebug.println("   hostOTA:<url>");
             SerialDebug.println("   binOTA:<bin name>");
             SerialDebug.println("   grabOTA -- perform OTA");
-
-
+            
+            
             SerialDebug.println();
             SerialDebug.println(" *** STATUS ***");
-
+            
             get_WIFIInfoString();
-
-            // SerialDebug.println("m5");
+            
 #ifdef TEST_JSON
             SerialDebug.println();
             SerialDebug.println("** JSON Array Testing **");
@@ -301,15 +346,19 @@ void loop_mainModule()
             SerialDebug.println("jsonMappings");
             SerialDebug.println("jsonPersist"); //  writes to memory....
             SerialDebug.println("jsonInit"); //  reads from memory....
-
+            
 #endif
+        }
+        else if (command.startsWith("partition"))
+        {
+            showPartitioSchemes();
         }
         //! 7.20.25
         else if (command.startsWith("NTP") || command.startsWith("ntp"))
         {
             
             int timeNow = getTimeStamp_mainModule();
-
+            
         }
         else if (command.startsWith("status"))
         {
@@ -319,7 +368,7 @@ void loop_mainModule()
             
             SerialDebug.println(" Specify OTA Host/Bin");
             SerialDebug.printf("hostOTA=%s, binOTA:%s\n", _hostOTA, _binOTA);
-
+            
         }
         else if (command.startsWith("r"))
         {
@@ -363,14 +412,14 @@ void loop_mainModule()
             //!retrieves from constant location
             performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/Bootstrap/ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin");
         }
-        else if (command == "m5atom")
+        else if (command.startsWith("m5atom") || command.startsWith("5"))
         {
             SerialDebug.println(" *** performing m5atom OTA Update");
             
             //!retrieves from constant location
             performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin");
         }
-        else if (command == "m5atomDaily")
+        else if (command.startsWith("m5atomDaily") || command.startsWith("6"))
         {
             SerialDebug.println(" *** performing m5atom OTA Update - DAILY");
             
@@ -440,6 +489,11 @@ void loop_mainModule()
             jsonInit();
         }
 #endif
+        
+        else if (command.startsWith("m5"))
+        {
+            SerialDebug.printf("TBD: Build for %s\n", command);;
+        }
         else
         {
             SerialDebug.printf("*** Unnown Command: %s\n", command);

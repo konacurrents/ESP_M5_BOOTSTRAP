@@ -23,7 +23,7 @@
 
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
 
-#define VERSION "v7_25_25(2.3b)-BOOTSTRAP_JSON_OTA_NTP"
+#define VERSION "v7_31_25(2.3c)-BOOTSTRAP_JSON_OTA_NTP_56"
 
 //! for OTA
 #define USE_MQTT_NETWORKING
