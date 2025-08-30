@@ -22,12 +22,14 @@
 
 
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
+#define VERSION "v8_30_25(2.4)-BOOTSTRAP_COLOR_JSON_OTA_NTP_56"
 
-#define VERSION "v7_31_25(2.3c)-BOOTSTRAP_JSON_OTA_NTP_56"
+//#define VERSION "v7_31_25(2.3c)-BOOTSTRAP_JSON_OTA_NTP_56"
 
 //! for OTA
 #define USE_MQTT_NETWORKING
 
+#define USE_FAST_LED
 
 //https://forum.arduino.cc/t/single-line-define-to-disable-code/636044/4
 // Turn on/off Serial printing being included in the executable

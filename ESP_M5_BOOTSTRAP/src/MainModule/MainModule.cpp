@@ -26,6 +26,15 @@ WiFiClient _espClient;
 //! uses the SSID and PASSWORD
 void tryConnect();
 
+#define USE_FAST_LED
+//! 7.24.25 Hot Day, Ballon last night, Mt Out
+//! for the 'C' option of atom color
+#ifdef USE_FAST_LED
+#include "../ATOM_LED_Module/M5Display.h"
+#include "../ATOM_LED_Module/LED_DisPlay.h"
+#endif
+
+
 /*
  Set: otafile, Val: http://KnowledgeShark.org/OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin
  main_dispatchAsyncCommandWithString:1: http://KnowledgeShark.org/OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin
@@ -101,6 +110,46 @@ char *wifiStatus_MQTT()
     }
 }
 
+//! 8.30.25 current M5 color index
+int _cycleColorIndex = 0;
+
+//! 8.30.25 cycle M5 color
+void cycleColorIndex()
+{
+    // Light the LED with the specified RGB color
+    // 00ff00(Atom-Matrix has only one light).
+    // 以指定RGB颜色0x00ff00点亮第0个LED
+    switch (_cycleColorIndex) {
+        case 0:
+            SerialDebug.println("Color Yellow");
+            drawpix(0, L_YELLOW);  // YELLOW 黄色
+            break;
+        case 1:
+            SerialDebug.println("Color RED");
+
+            drawpix(0, L_RED);  // RED  红色
+            break;
+        case 2:
+            SerialDebug.println("Color BLUE");
+
+            drawpix(0, L_BLUE);  // BLUE  蓝色
+            break;
+        case 3:
+            SerialDebug.println("Color GREEN");
+
+            drawpix(0, L_GREEN);  // GREEN  绿色
+            break;
+        case 4:
+            SerialDebug.println("Color WHITE");
+
+        default:
+            drawpix(0, L_WHITE);  // WHITE
+            break;
+  
+    }
+    _cycleColorIndex = (++_cycleColorIndex) % 5;
+    
+}
 
 //!the EPROM is in preferences.h
 #include <Preferences.h>
@@ -141,6 +190,11 @@ char * getPreference(char* preferenceID)
 }
 void setup_mainModule()
 {
+    setup_M5Display();
+    //! 8.30.25 LA warm
+    //! start with a color
+    cycleColorIndex();
+
     SerialDebug.println("**** type on the serial monitor. Start with 'help'  ****");
 #ifdef TEST_JSON
     setup_JSON_Module();
@@ -217,6 +271,8 @@ int getTimeStamp_mainModule()
     return now;
 }
 
+
+
 //! show partition schemes
 void showPartitioSchemes()
 {
@@ -255,6 +311,21 @@ void showPartitioSchemes()
     
 }
 
+//! 8.30.25 show pin use
+void showPinUse()
+{
+    
+    //! 7.31.25 PIN USE
+    PinUseStruct pinUseStruct = getPinUseStruct_mainModule();
+    SerialTemp.printf(" *** PIN USE (%d) .. check for duplicated. Will do this for you later..\n", pinUseStruct.pinUseCount);
+    
+    for (int i=0; i< pinUseStruct.pinUseCount; i++)
+    {
+        SerialTemp.println(pinUseStruct.pinUseArray[i]);
+    }
+    SerialTemp.printf(" *** PIN Count = %d\n", pinUseStruct.pinUseCount);
+
+}
 //! main loop
 void loop_mainModule()
 {
@@ -332,7 +403,13 @@ void loop_mainModule()
             SerialDebug.println("   binOTA:<bin name>");
             SerialDebug.println("   grabOTA -- perform OTA");
             
-            
+            //! 8,30.25 LA (Zuma Beach) Warm
+            //! cycle colors on M5
+            SerialDebug.println(" *** Cycle Colors ***");
+            SerialDebug.println("   cycle - colors on M5");
+            SerialDebug.println("   pins  - show pin use");
+
+
             SerialDebug.println();
             SerialDebug.println(" *** STATUS ***");
             
@@ -352,6 +429,16 @@ void loop_mainModule()
         else if (command.startsWith("partition"))
         {
             showPartitioSchemes();
+        }
+        //!8.30.25 LA Warm
+        else if (command.startsWith("cycle"))
+        {
+            cycleColorIndex();
+        }
+        //!8.30.25 LA Warm
+        else if (command.startsWith("pins"))
+        {
+            showPinUse();
         }
         //! 7.20.25
         else if (command.startsWith("NTP") || command.startsWith("ntp"))
@@ -500,4 +587,52 @@ void loop_mainModule()
             SerialDebug.printf("*** Unnown Command: %s\n", command);
         }
     }
+}
+
+
+#pragma mark PIN USE to see if overlaps.
+//! 7.31.25 add this for a status, saw that QRCode was using 22 also  .. so buzer didn't work.
+/**
+ #define PIN_USE_MAX 10
+ struct pinUseStruct {
+ int pinUseCount;
+ char *pinUseArray[PIN_USE_MAX];
+ } _pinUseStruct;
+ */
+
+//! global for use
+PinUseStruct _pinUseStruct;
+//! get the pin use array
+PinUseStruct getPinUseStruct_mainModule()
+{
+    return _pinUseStruct;
+}
+
+//! 7.31.25 store this information.. for STATUS
+//! 5.3.25 add a central clearing house for defining PIN use
+//! @see issue #365
+//! central clearing house for all pins used to we can analyze if there are overlaps
+//! pin is the actual number, pinName is the local name (eg. IN1_PIN or VIN_PIN).
+//! moduleName is the module in the code,
+//! isI2C is whether this is a I2C bus (which we aren't using much yet)
+void registerPinUse_mainModule(long pin, String pinName, String moduleName, boolean isI2C)
+{
+    char pinUseSample[100];
+    sprintf(pinUseSample,"PIN_USE: %2d = %s, %s %s", pin, pinName.c_str(), moduleName.c_str(), isI2C?"(I2C)":"");
+    //! 5.3.25 create storage here
+    char *pinUse = (char*)calloc(strlen(pinUseSample)+1, sizeof(char));
+    strcpy(pinUse, pinUseSample);
+    //!store globally
+    _pinUseStruct.pinUseArray[_pinUseStruct.pinUseCount] = pinUse;
+    //! increment
+    _pinUseStruct.pinUseCount++;
+    
+    if (_pinUseStruct.pinUseCount >= PIN_USE_MAX)
+    {
+        SerialError.printf("*** ERROR .. too many PINS defined ***");
+        _pinUseStruct.pinUseCount=0;
+        
+    }
+    
+    SerialDebug.printf("** PIN_USE: %s = %d, module=%s %s\n", pinName.c_str(), pin, moduleName.c_str(), isI2C?"(I2C)":"");
 }
