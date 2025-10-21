@@ -1,8 +1,10 @@
 #include "../../Defines.h"
 #ifdef USE_FAST_LED
+#ifndef ESP_M5_ATOM_LITE
 #include "LED_DisPlay.h"
 
 #define DATA_PIN 27
+
 
 /**
  * Code is from M5Atom.h object, but refactored to be it's own object
@@ -229,4 +231,7 @@ void LED_DisPlay::setWidthHeight(uint16_t xColumns, uint16_t yRows)
     _yRows = yRows;
 }
 
+#endif //ESP_M5_ATOM_LITE
+
 #endif //USE_FAST_LED
+

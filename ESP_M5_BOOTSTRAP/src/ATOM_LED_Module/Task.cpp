@@ -1,6 +1,7 @@
 #include "../../Defines.h"
 
 #ifdef USE_FAST_LED
+#ifndef ESP_M5_ATOM_LITE
 
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
@@ -8,6 +9,7 @@
 #include <string>
 
 #include "Task.h"
+
 
 static char tag[] = "Task";
 
@@ -80,5 +82,6 @@ void Task::setCore(BaseType_t coreID)
 	m_coreid = coreID;
 }
 
+#endif //ESP_M5_ATOM_LITE
 
 #endif //USE_FAST_LED

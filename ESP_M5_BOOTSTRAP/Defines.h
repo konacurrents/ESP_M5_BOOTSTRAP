@@ -74,7 +74,11 @@
 #ifdef ESP_M5_ATOM_S3
 #include <M5AtomS3.h>
 #else
+#ifdef ESP_M5_ATOM_LITE
+#include <M5Atom.h>
+#else
 #include <M5StickCPlus.h>
+#endif
 #endif
 #endif
 

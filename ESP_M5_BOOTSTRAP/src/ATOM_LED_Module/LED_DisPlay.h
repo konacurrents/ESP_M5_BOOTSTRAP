@@ -3,6 +3,7 @@
 #include "../../Defines.h"
 
 #ifdef USE_FAST_LED
+#ifndef ESP_M5_ATOM_LITE
 /**
  * Code is from M5Atom.h object, but refactored to be it's own object
  */
@@ -73,6 +74,8 @@ private:
     void _displaybuff(uint8_t *buffptr, int32_t offsetx = 0, int32_t offsety = 0);
 };
 
+
+#endif //ESP_M5_ATOM_LITE
 
 #endif //USE_FAST_LED
 

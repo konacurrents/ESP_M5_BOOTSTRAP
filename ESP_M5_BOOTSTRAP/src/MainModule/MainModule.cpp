@@ -59,12 +59,12 @@ char _binOTA_bootstrap[200];
 
 void setupWIFI(char *arg_ssid, char* arg_password)
 {
-    //!start the WIFI mode and begin
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(arg_ssid, arg_password);
-    SerialDebug.printf("WiFi.begin(%s,%s)\n", arg_ssid, arg_password);
-   
-
+  //!start the WIFI mode and begin
+  // need to be fully disconnected if changing ssid/wpa
+  WiFi.disconnect();
+  delay(100);
+  WiFi.begin(arg_ssid, arg_password);
+  SerialDebug.printf("WiFi.begin(%s,%s)\n\r", arg_ssid, arg_password);
 }
 
 String _WIFIInfoString;
@@ -222,7 +222,7 @@ void setup_mainModule()
 void tryConnect()
 {
     int count = 0;
-    SerialDebug.printf("Trying Connection: %s, %s\n", _ssid, _wifiPassword);
+    SerialDebug.printf("Trying Connection: %s, %s\n\r", _ssid, _wifiPassword);
 
     //!setup the WIFI.begin
     setupWIFI(_ssid, _wifiPassword);
@@ -267,7 +267,7 @@ int getTimeStamp_mainModule()
     if (_ntpServerInit)
         now = _timeClient->getEpochTime();
 
-    SerialMin.printf("Unix Time: %d\n", now);
+    SerialMin.printf("Unix Time: %d\n\r", now);
     return now;
 }
 
@@ -317,15 +317,62 @@ void showPinUse()
     
     //! 7.31.25 PIN USE
     PinUseStruct pinUseStruct = getPinUseStruct_mainModule();
-    SerialTemp.printf(" *** PIN USE (%d) .. check for duplicated. Will do this for you later..\n", pinUseStruct.pinUseCount);
+    SerialTemp.printf(" *** PIN USE (%d) .. check for duplicated. Will do this for you later..\n\r", pinUseStruct.pinUseCount);
     
     for (int i=0; i< pinUseStruct.pinUseCount; i++)
     {
         SerialTemp.println(pinUseStruct.pinUseArray[i]);
     }
-    SerialTemp.printf(" *** PIN Count = %d\n", pinUseStruct.pinUseCount);
+    SerialTemp.printf(" *** PIN Count = %d\n\r", pinUseStruct.pinUseCount);
 
 }
+//! Read and echo characters until newline, return trimmed string
+String readAndEchoLine() 
+{
+    String inputString = "";
+    const int MAX_LINE_LENGTH = 128;
+    
+    while (true) 
+    {
+        if (Serial.available()) 
+        {
+            char c = Serial.read();
+            
+            // Handle newline OR carriage return - terminate and return
+            if (c == '\n' || c == '\r') 
+            {
+                Serial.println(); // Echo the newline for visual feedback
+                inputString.trim();
+                return inputString;
+            }
+            
+            // Handle backspace
+            if (c == '\b' || c == 127) // 127 is DEL character 
+            {
+                if (inputString.length() > 0) 
+                {
+                    inputString.remove(inputString.length() - 1);
+                    Serial.print("\b \b"); // Backspace, space, backspace
+                }
+                continue;
+            }
+            
+            // Only process ASCII printable characters (32-126)
+            if (c >= 32 && c <= 126) 
+            {
+                // Check max length
+                if (inputString.length() < MAX_LINE_LENGTH) 
+                {
+                    inputString += c;
+                    Serial.print(c); // Echo the character
+                }
+                // Silently ignore characters beyond max length
+            }
+            // Non-ASCII characters are ignored (no echo, no add to string)
+        }
+    }
+}
+
 //! main loop
 void loop_mainModule()
 {
@@ -347,18 +394,18 @@ void loop_mainModule()
     //! see if data on the serial input
     if (Serial.available())
     {
-        // read string until meet newline character
-        String command = Serial.readStringUntil('\n');
-        
+        // read string until meet newline character with echo
+        SerialDebug.printf("# ");
+        String command = readAndEchoLine();
         SerialDebug.println(command);
-        
+	command.toLowerCase();
         if (command == "help" || command == ".")
         {
             //! print time
             if (_ntpServerInit)
                 SerialDebug.println(_timeClient->getFormattedTime());
             
-            getTimeStamp_mainModule();
+            getTimeStamp_mainModule(); 
             
             SerialDebug.println("Boostrap OTA, type one of the following:");
             SerialDebug.println();
@@ -377,8 +424,8 @@ void loop_mainModule()
             SerialDebug.println(" **** WIFI INFO ****");
             SerialDebug.println("    ** enter 'ssid:<ssid>' etc");
             
-            SerialDebug.printf( "   ssid:%s\n", _ssid);
-            SerialDebug.printf( "   wifi:%s\n", _wifiPassword);
+            SerialDebug.printf( "   ssid:%s\n\r", _ssid);
+            SerialDebug.printf( "   wifi:%s\n\r", _wifiPassword);
             SerialDebug.println("   connect -- try to connect");
             SerialDebug.println("   NTP Time -- get current time");
             
@@ -426,22 +473,22 @@ void loop_mainModule()
             
 #endif
         }
-        else if (command.startsWith("partition"))
+        else if (command == "partition")
         {
             showPartitioSchemes();
         }
         //!8.30.25 LA Warm
-        else if (command.startsWith("cycle"))
+        else if (command == "cycle")
         {
             cycleColorIndex();
         }
         //!8.30.25 LA Warm
-        else if (command.startsWith("pins"))
+        else if (command == "pins")
         {
             showPinUse();
         }
         //! 7.20.25
-        else if (command.startsWith("NTP") || command.startsWith("ntp"))
+        else if (command == "ntp")
         {
             
             int timeNow = getTimeStamp_mainModule();
@@ -449,15 +496,15 @@ void loop_mainModule()
         }
         else if (command.startsWith("status"))
         {
-            SerialDebug.printf("ssid=%s, wifi=%s\n", _ssid, _wifiPassword);
+            SerialDebug.printf("ssid=%s, wifi=%s\n\r", _ssid, _wifiPassword);
             SerialDebug.println(wifiStatus_MQTT());
             String get_WIFIInfoString();
             
             SerialDebug.println(" Specify OTA Host/Bin");
-            SerialDebug.printf("hostOTA=%s, binOTA:%s\n", _hostOTA, _binOTA);
+            SerialDebug.printf("hostOTA=%s, binOTA:%s\n\r", _hostOTA, _binOTA);
             
         }
-        else if (command.startsWith("r"))
+        else if (command == "r" || command == "reboot")
         {
             SerialDebug.println("REBOOT");
             //reboot
@@ -475,7 +522,7 @@ void loop_mainModule()
             savePreference((char*)PREFERENCES_SSID, (char*)_ssid);
 #endif
         }
-        else if (command.startsWith("connect"))
+        else if (command == "connect")
         {
             tryConnect();
         }
@@ -484,7 +531,6 @@ void loop_mainModule()
             int colon = command.indexOf(":");
             String subset = command.substring(colon+1);
             strcpy(_wifiPassword,  subset.c_str());
-            
 #ifdef SAVE_SSID_IN_EPROM
             //! save in EPROM
             savePreference((char*)PREFERENCES_WIFI, (char*)_wifiPassword);
@@ -500,14 +546,14 @@ void loop_mainModule()
             performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/Bootstrap/ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin");
         }
       //! must be first..
-        else if (command.startsWith("m5atomDaily") || command.startsWith("6"))
+        else if (command == "m5atomDaily" || command =="6")
         {
             SerialDebug.println(" *** performing m5atom OTA Update - DAILY");
             
             //!retrieves from constant location
             performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/TEST/M5Atom/daily/ESP_IOT.ino.m5stick_c_plus.bin");
         }
-        else if (command.startsWith("m5atom") || command.startsWith("5"))
+        else if (command == "m5atom" || command == "5")
         {
             SerialDebug.println(" *** performing m5atom OTA Update");
             
@@ -531,7 +577,7 @@ void loop_mainModule()
         }
         else if (command.startsWith("grabOTA"))
         {
-            SerialDebug.printf(" *** performing custom OTA Update: %s/%s", _hostOTA, _binOTA);
+            SerialDebug.printf(" *** performing custom OTA Update: %s/%s\n\r", _hostOTA, _binOTA);
             
             //!retrieves from constant location
             performOTAUpdate(_hostOTA, _binOTA);
@@ -562,29 +608,29 @@ void loop_mainModule()
             //! call getMapping
             char *mapping = getMapping(nameC);
             //! print result
-            SerialDebug.printf("Mapping = %s\n", mapping);
+            SerialDebug.printf("Mapping = %s\n\r", mapping);
         }
-        else if (command.startsWith("jsonMappings"))
+        else if (command == "jsonMappings")
         {
             showMappings();
         }
-        else if (command.startsWith("jsonPersist"))
+        else if (command == "jsonPersist")
         {
             jsonPersist();
         }
-        else if (command.startsWith("jsonInit"))
+        else if (command == "jsonInit")
         {
             jsonInit();
         }
 #endif
         
-        else if (command.startsWith("m5"))
+        else if (command == "m5")
         {
-            SerialDebug.printf("TBD: Build for %s\n", command);;
+            SerialDebug.printf("TBD: Build for %s\n\r", command);;
         }
         else
         {
-            SerialDebug.printf("*** Unnown Command: %s\n", command);
+            SerialDebug.printf("*** Unknown Command: %s\n\r", command);
         }
     }
 }

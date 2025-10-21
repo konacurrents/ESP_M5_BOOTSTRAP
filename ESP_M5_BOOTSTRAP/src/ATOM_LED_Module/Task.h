@@ -9,6 +9,7 @@
 #include <freertos/task.h>
 #include <string>
 
+#ifndef ESP_M5_ATOM_LITE
 class Task
 {
 public:
@@ -37,6 +38,8 @@ private:
 	/* data */
 };
 
-#endif
+#endif //ESP_M5_ATOM_LITE
 
 #endif //_TASK_PERSION_H_
+
+#endif
