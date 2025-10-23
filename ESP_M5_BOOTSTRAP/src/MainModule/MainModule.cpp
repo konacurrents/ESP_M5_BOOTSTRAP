@@ -403,6 +403,14 @@ void loop_mainModule()
             SerialDebug.println("   binOTA:<bin name>");
             SerialDebug.println("   grabOTA -- perform OTA");
             
+            
+            //! 10.11.25 after nice flume walk (rain some)
+            //! add the M5 (Red M5)
+            SerialDebug.println();
+            SerialDebug.println(" *** M5 Stack  ***");
+            SerialDebug.println("   m5stack");
+
+            
             //! 8,30.25 LA (Zuma Beach) Warm
             //! cycle colors on M5
             SerialDebug.println(" *** Cycle Colors ***");
@@ -513,6 +521,15 @@ void loop_mainModule()
             
             //!retrieves from constant location
             performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin");
+        }
+        //! 10.11.25 M5Stack
+        else if (command.startsWith("m5stack"))
+        {
+            SerialDebug.println(" *** performing m5stack OTA Update");
+            
+            //!retrieves from constant location
+            performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/ESP_IOT.ino.m5stick_c_plus.bin");
+
         }
         //! 7.18.25
         else if (command.startsWith("hostOTA:"))

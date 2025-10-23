@@ -1,7 +1,12 @@
 # show the options
 
+showLibs:
+	arduino-cli lib list
+
+
 compileM5Atom:
-	/opt/homebrew/bin/arduino-cli compile --build-property compiler.cpp.extra_flags=-DESP_M5_ATOM_LITE --fqbn esp32:esp32:m5stick-c | tee output
+	/opt/homebrew/bin/arduino-cli compile --build-property compiler.cpp.extra_flags=-DESP_M5_ATOM_LITE --fqbn esp32:esp32:m5stick-c:PartitionScheme=min_spiffs | tee output
+
 
 # uploads this to the OTA/Bootstrap
 # This requires premission to upload to a foreign web location
