@@ -1,8 +1,8 @@
 #include "../../Defines.h"
+#include "M5Display.h"
 
 #ifdef USE_FAST_LED
 
-#include "M5Display.h"
 #include "LED_DisPlay.h"
 //! the LED DIsplay Object
 LED_DisPlay _dis;
@@ -90,4 +90,9 @@ CRGB getRandomColor()
     }
 }
 
+#else
+void setup_M5Display()
+{
+    SerialDebug.println("setup_M5Display");
+}
 #endif // USE_FAST_LED

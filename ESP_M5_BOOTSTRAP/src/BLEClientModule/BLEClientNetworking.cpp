@@ -12,10 +12,11 @@
 *  Created: on March 24 2020
 *      Author: H2zero
 */
-#include "BLETest.h"
+#include "BLEClientNetworking.h"
+#define NEW_BLE_CODE_2_x
+#ifdef NEW_BLE_CODE_2_x
 
-
-#define USE_FAST_LED
+//#define USE_FAST_LED
 //! 7.24.25 Hot Day, Ballon last night, Mt Out
 //! for the 'C' option of atom color
 #ifdef USE_FAST_LED
@@ -23,12 +24,7 @@
 #include "../ATOM_LED_Module/LED_DisPlay.h"
 #endif
 
-
-#define TRY_NEW_BLE
-#ifdef TRY_NEW_BLE
-//#include <M5Atom.h>
 #include <NimBLEDevice.h>
-
 
 //!check if the string contains the other string. This is a poor man's grammer checker
 bool containsSubstring2(char *message, char *substring)
@@ -41,8 +37,12 @@ bool containsSubstring2(char *message, char *substring)
 }
 
 // UUIDs must match the feeder
-#define SERVICE_UUID        "0000DEAD-0000-1000-8000-00805f9b34fb"
-#define CHARACTERISTIC_UUID "0000BEEF-0000-1000-8000-00805f9b34fb"
+//#define SERVICE_UUID        "0000DEAD-0000-1000-8000-00805f9b34fb"
+//#define CHARACTERISTIC_UUID "0000BEEF-0000-1000-8000-00805f9b34fb"
+
+
+#define PT_SERVICE_UUID        "b0e6a4bf-cccc-ffff-330c-0000000000f0"  //Pet Tutor feeder service for feed  NOTE: Lower case for GEN3 compatability
+#define PT_CHARACTERISTIC_UUID "b0e6a4bf-cccc-ffff-330c-0000000000f1"  //Pet Tutor feeder characteristic  NOTE: Lower case for GEN3 compatability
 
 static const NimBLEAdvertisedDevice* _advertisedDevice;
 static bool                          _doConnect  = false;
@@ -91,7 +91,7 @@ class ClientCallbacks : public NimBLEClientCallbacks {
             return;
         }
     }
-} clientCallbacks;
+} _clientCB_BLEClient;
 
 /** Define a class to handle the callbacks when scan events are received */
 class ScanCallbacks : public NimBLEScanCallbacks
@@ -100,8 +100,9 @@ class ScanCallbacks : public NimBLEScanCallbacks
     {
         SerialLots.printf("Advertised Device found: %s\n", advertisedDevice->toString().c_str());
         //if (advertisedDevice->isAdvertisingService(NimBLEUUID("DEAD"))) {
-        if (advertisedDevice->isAdvertisingService(BLEUUID(SERVICE_UUID)))
-        {
+       // if (advertisedDevice->isAdvertisingService(BLEUUID(SERVICE_UUID)))
+            if (advertisedDevice->isAdvertisingService(BLEUUID(PT_SERVICE_UUID)))
+      {
 
             //SerialDebug.printf("Found Our Service\n");
             SerialMin.print("Device advertised: ");
@@ -146,17 +147,19 @@ void notifyCB(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData,
 
 // Button press tracking
 bool _buzzerState = false;  // false = off, true = on
-
-void sendCommand(const char* cmd)
+//! send a command to the device..
+void sendCommand(char* cmd)
 {
     if (_pRemoteCharacteristic && _pClient->isConnected())
     {
         _pRemoteCharacteristic->writeValue((uint8_t*)cmd, strlen(cmd), true); // write with response
         SerialDebug.print("Sent command: ");
         SerialDebug.println(cmd);
+#ifdef USE_FAST_LED
         drawpix(0, 0xFF0000); // red blink
         delay(200);
         drawpix(0, 0x0000FF); // blue idle
+#endif
     } else
     {
         SerialDebug.println("Not connected to feeder");
@@ -245,7 +248,7 @@ bool connectToServer()
         
         SerialDebug.printf("New client created\n");
         
-        pClient->setClientCallbacks(&clientCallbacks, false);
+        pClient->setClientCallbacks(&_clientCB_BLEClient, false);
         /**
          *  Set initial connection parameters:
          *  These settings are safe for 3 clients to connect reliably, can go faster if you have less
@@ -286,7 +289,7 @@ bool connectToServer()
     
     //!store so can write later ...
     _pRemoteCharacteristic = pChr;
-    
+#ifdef NOT_NEEDED
     if (pChr) {
         if (pChr->canRead()) {
             SerialDebug.printf("%s Value: %s\n", pChr->getUUID().toString().c_str(), pChr->readValue().c_str());
@@ -367,6 +370,7 @@ bool connectToServer()
     }
     
     SerialDebug.printf("Done with this device!\n");
+#endif
     return true;
 }
 
@@ -418,11 +422,13 @@ void setupFeeder()
 }
 
 //! main entry point for setup_BLETest
-void setup_BLETest()
+void setup_BLEClientNetworking()
 {
+#ifdef USE_FAST_LED
     //M5.begin(true, false, true);
     //Serial.begin(115200);
     drawpix(0, 0x000000); // off
+#endif
     
     //connectToFeeder();
     setupFeeder();
@@ -440,9 +446,10 @@ boolean _longLongPressB_MainModule = false;
 void checkButtonA_MainModule();
 void checkButtonB_MainModule();
 
-void loop_BLETest()
+//!main loop
+void loop_BLEClientNetworking()
 {
-    M5.update();
+  //  M5.update();
     
     //! check button presses
     checkButtonA_MainModule();
@@ -462,7 +469,7 @@ void loop_BLETest()
             //return; /// try 4.22.22
             
             //! don't scan anymore ..
-            sendCommand("s");
+            //sendCommand("s");
 
         }
         else
@@ -479,7 +486,7 @@ void loop_BLETest()
     {
         SerialDebug.println("_shortPress");
         // Short press: send feed command
-        sendCommand("s");
+        sendCommand((char*)"s");
     }
     else if (_longLongPressA_MainModule || _longLongPressB_MainModule)
     {
@@ -487,7 +494,7 @@ void loop_BLETest()
 
         // Press and hold (>= 2 seconds): toggle buzzer
         _buzzerState = !_buzzerState;
-        sendCommand(_buzzerState ? "B" : "b");
+        sendCommand(_buzzerState ? (char*)"B" : (char*)"b");
     }
     
     delay(50);
@@ -500,7 +507,7 @@ void checkButtonA_MainModule()
     _longPressA_MainModule = false;
     _longLongPressA_MainModule = false;
 #ifdef ESP_M5
-    
+#ifdef LATER
     //!NOTE: ths issue is the timer is interruped by the scanner.. so make long-long very long..
     //was 1000  (from 500)
     if (M5.BtnA.wasReleasefor(4500))
@@ -518,9 +525,10 @@ void checkButtonA_MainModule()
     else if (M5.BtnA.wasReleased())
     {
         //        buttonA_shortPress_MainModule();
-        SerialDebug.println("MainModule **** SHORT PRESS ***");
+        SerialDebug.println("MainModule A **** SHORT PRESS ***");
         _shortPressA_MainModule = true;
     }
+#endif
 #endif
 }
 //!big button on front of M5StickC Plus
@@ -530,7 +538,7 @@ void checkButtonB_MainModule()
     _longPressB_MainModule = false;
     _longLongPressB_MainModule = false;
 #ifdef ESP_M5
-    
+#ifdef LATER
     //!NOTE: ths issue is the timer is interruped by the scanner.. so make long-long very long..
     //was 1000  (from 500)
     if (M5.BtnB.wasReleasefor(4500))
@@ -548,9 +556,10 @@ void checkButtonB_MainModule()
     else if (M5.BtnB.wasReleased())
     {
         //        buttonA_shortPress_MainModule();
-        SerialDebug.println("MainModule **** SHORT PRESS ***");
+        SerialDebug.println("MainModule B **** SHORT PRESS ***");
         _shortPressB_MainModule = true;
     }
+#endif
 #endif
 }
 #else

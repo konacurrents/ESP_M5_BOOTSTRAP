@@ -1,9 +1,23 @@
 #include "MainModule.h"
 
+#include "../ATOM_LED_Module/M5Display.h"
+
 #include <string>
 //#include <HTTPClient.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
+
+//! 11.21.25 test BLE
+#include "../BLEClientModule/BLEClientNetworking.h"
+//! 6.7.26 server
+#include "../BLEServerModule/BLEServerNetworking.h"
+
+//! 12.4.25 M5Chain
+#include "../M5ChainModule/M5ChainTest.h"
+
+
+#define PT_SERVICE_UUID        "b0e6a4bf-cccc-ffff-330c-0000000000f0"  //Pet Tutor feeder service for feed  NOTE: Lower case for GEN3 compatability
+#define PT_CHARACTERISTIC_UUID "b0e6a4bf-cccc-ffff-330c-0000000000f1"  //Pet Tutor feeder characteristic  NOTE: Lower case for GEN3 compatability
 
 //! 7.21.25
 #include "../Time/NTPClient.h"
@@ -26,11 +40,10 @@ WiFiClient _espClient;
 //! uses the SSID and PASSWORD
 void tryConnect();
 
-#define USE_FAST_LED
+//#define USE_FAST_LED
 //! 7.24.25 Hot Day, Ballon last night, Mt Out
 //! for the 'C' option of atom color
 #ifdef USE_FAST_LED
-#include "../ATOM_LED_Module/M5Display.h"
 #include "../ATOM_LED_Module/LED_DisPlay.h"
 #endif
 
@@ -44,6 +57,19 @@ void tryConnect();
  Fetching Bin: /OTA/TEST/M5Atom/ESP_IOT.ino.m5stick_c_plus.bin
  
  */
+
+bool _sendCommand = false;
+char _commandToSend[500];
+
+//! test for sending a FEED message
+//! ASYNC .. so the loop sees the _sendCommand flag and sends..
+void sendCommand_main(char* cmd)
+{
+    //! send cmd to the BLEClient
+    //sendCommand(cmd);
+    strcpy(_commandToSend, cmd);
+    _sendCommand = true;
+}
 
 //! globals for WIFI
 char _ssid[100];
@@ -116,6 +142,7 @@ int _cycleColorIndex = 0;
 //! 8.30.25 cycle M5 color
 void cycleColorIndex()
 {
+#ifdef LATER_6_10_26
     // Light the LED with the specified RGB color
     // 00ff00(Atom-Matrix has only one light).
     // 以指定RGB颜色0x00ff00点亮第0个LED
@@ -148,6 +175,7 @@ void cycleColorIndex()
   
     }
     _cycleColorIndex = (++_cycleColorIndex) % 5;
+#endif
     
 }
 
@@ -188,9 +216,66 @@ char * getPreference(char* preferenceID)
     _preferencesMainModule.end();
     return _preferenceBuffer;
 }
+
+//! placeholders
+char *getDeviceNameMQTT()
+{
+    return (char*)"M5ScottyBoy";
+}
+
+//! 10.10.25 #405 #406
+//! see if the device is a PTClicker if the M5Atom class is one..
+//! return the service name:  PTClicker or PTFeeder
+char *getServerServiceName_mainModule()
+{
+ //   if (isPTFeeder_mainModule())
+    bool flag = true;
+#ifdef ESP_M5_ATOM_S3
+    flag = false;
+#endif
+    if (flag)
+        return MAIN_BLE_SERVER_SERVICE_NAME_PTFeeder;
+    else
+        return MAIN_BLE_SERVER_SERVICE_NAME_PTClicker;
+}
+
 void setup_mainModule()
 {
+#ifdef ESP_M5_ATOM_S3
+//    auto cfg = M5.config();
+//    AtomS3.begin(cfg);
+#else
+    //! start the M5
+      M5.begin();
+
+#endif
+   
+    //! for drawPix etc
     setup_M5Display();
+    
+#ifdef ESP_M5_ATOM_S3
+    //! added back with right pins .. 7.12.26
+    setup_M5ChainTest();
+
+#else
+    //! 12.4.25 M5Chain
+    setup_M5ChainTest();
+#endif
+    
+#pragma mark BLEServer
+    //! 11.21.25 try the BLETest
+    //! 10.10.25 #405 #406
+    //! see if the device is a PTClicker if the M5Atom class is one..
+    char *serverServiceName = getServerServiceName_mainModule();
+    
+    //strdup() get away from the
+    setup_BLEServerNetworking(serverServiceName, getDeviceNameMQTT(), strdup(PT_SERVICE_UUID), strdup(PT_CHARACTERISTIC_UUID));
+    SerialDebug.printf("done setupBLEServerNetworking: %s:%s\n", serverServiceName, getDeviceNameMQTT());
+    
+#pragma mark BLEClient
+    //! 11.21.25 try the BLETest
+    setup_BLEClientNetworking();
+    
     //! 8.30.25 LA warm
     //! start with a color
     cycleColorIndex();
@@ -329,6 +414,26 @@ void showPinUse()
 //! main loop
 void loop_mainModule()
 {
+    //! 11.21.25 try the BLETest
+    //! for 3.x Unified, and 2.x BLE
+    loop_BLEClientNetworking();
+    //! server too ..
+    loop_BLEServerNetworking();
+    
+    //! look for async
+    if (_sendCommand)
+    {
+        _sendCommand = false;
+        sendCommand(_commandToSend);
+    }
+   
+    
+#ifdef ESP_M5_ATOM_S3
+    //! added back with right pins .. 7.12.26
+
+    //! 12.4.25 M5Chain
+    loop_M5ChainTest();
+#endif
     
     if (_ntpServerInit)
     {
@@ -344,6 +449,19 @@ void loop_mainModule()
         
     }
     
+#ifdef ESP_M5_ATOM_S3
+    //! try the buttons here
+    if (AtomS3.BtnA.wasPressed()) {
+        
+        Serial.println("Pressed");
+    }
+    if (AtomS3.BtnA.wasReleased()) {
+        
+        Serial.println("Released");
+        sendCommand_main((char*)"{'cmd':'feed'}");
+
+    }
+#endif
     //! see if data on the serial input
     if (Serial.available())
     {
@@ -391,6 +509,11 @@ void loop_mainModule()
             SerialDebug.println("   m5atom  (or 5)");
             SerialDebug.println("   m5atomDaily (or 6)");
             SerialDebug.println();
+            //! 7.10.26 M5AtomS3 (without display)
+            SerialDebug.println("   y -  _m5atomS3");
+            SerialDebug.println("   Y -  _mm5atomS3Daily");
+            SerialDebug.println();
+
             SerialDebug.println("   m5atomS3 - the one with display");
             SerialDebug.println("   m5camera - the one with camera");
             SerialDebug.println("   m5Core2 - the CORE2");
@@ -507,6 +630,27 @@ void loop_mainModule()
             //!retrieves from constant location
             performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/Bootstrap/ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin");
         }
+#pragma mark M5AtomS3 OTA
+        //! 7.10.26 M5AtomS3 (without display)
+//        SerialDebug.println("   y -  _m5atomS3");
+//        SerialDebug.println("   Y -  _mm5atomS3Daily");
+//! must be first..
+        else if (command.startsWith("y"))
+        {
+            SerialDebug.println(" *** performing m5atomS3 OTA Update");
+            
+            //!retrieves from constant location
+            performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/TEST/M5AtomS3/ESP_IOT.ino.m5stick_c_plus.bin");
+        }
+        else if (command.startsWith("Y"))
+        {
+            SerialDebug.println(" *** performing m5atomS3 OTA Update - DAILY");
+            
+            //!retrieves from constant location
+            performOTAUpdate((char*)"http://KnowledgeShark.org", (char*)"OTA/TEST/M5AtomS3/daily/ESP_IOT.ino.m5stick_c_plus.bin");
+        }
+        
+#pragma mark M5AtomS3 END
       //! must be first..
         else if (command.startsWith("m5atomDaily") || command.startsWith("6"))
         {

@@ -4,27 +4,49 @@
 //  Created by Scott Moody on 3/8/22.
 //  NOW: May 14, 2025         5/14/25 (3+ years later)
 //NOW: 6.19.25 just the bootstrap version
+//NOW: 6.7.26 another year ... upgrading to M5Unified .. and 2.x BLE
 
 #ifndef Defines_h
 #define Defines_h
 
 //! ******* UPDATE THESE ********
-#define SSID_NAME "SunnyWhiteriver"
-#define SSID_PASSWORD "sunny2021"
+//#define SSID_NAME "SunnyWhiteriver"
+//#define SSID_PASSWORD "sunny2021"
+//#define SSID_NAME "Verizon-RC400L-A0"
+//#define SSID_PASSWORD "5e3ee45e"
+#define SSID_NAME "NeutraKuhns"
+#define SSID_PASSWORD "NeutraKuhns818"
+
+
+//!Defines the name of the service of the server, which for M5 will be PTClicker
+#define MAIN_BLE_SERVER_SERVICE_NAME_PTClicker (char*)"PTClicker"
+#define MAIN_BLE_SERVER_SERVICE_NAME_PTFeeder (char*)"PTFeeder"
 
 //! uncomment if you want to have SSID saved in EPROM
 //#define SAVE_SSID_IN_EPROM
 #define ESP_M5
 
+//! 3.7.26 try for the S3
+//go back for 7.13.26  
+//#define ESP_M5_ATOM_S3
+#ifdef ESP_M5_ATOM_S3
+//#include "M5Unified.h"
+#include "M5AtomS3.h"
 
-//! turn off to minimize
+#define PARTITION_SCHEME (char*)"Board=M5AtomS3 Unified,P= 8mb (3MB App 1.5 SPIFFS with OTA)"
+//#define PARTITION_SCHEME (char*)"Board=M5AtomS3 Unified,P=1.9MB App Minimal SPIFFS with OTA"
+#endif
+
+
+//! turn off to minimizein
 //#define TEST_JSON
 
 
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
 
+#define VERSION "v6_8_26(3.0)-BOOTSTRAP_UNIFIED_BLE_2"
 
-#define VERSION "v10_11_25(2.5)-BOOTSTRAP_M5STICK_COLOR_JSON_OTA_NTP_56"
+//#define VERSION "v12_04_25(2.5)-BOOTSTRAP_M5CHAIN_M5STICK_COLOR_JSON_OTA_NTP_56"
 
 //#define VERSION "v8_30_25(2.4)-BOOTSTRAP_COLOR_JSON_OTA_NTP_56"
 //#define VERSION "v7_31_25(2.3c)-BOOTSTRAP_JSON_OTA_NTP_56"
@@ -32,7 +54,7 @@
 //! for OTA
 #define USE_MQTT_NETWORKING
 
-#define USE_FAST_LED
+//#define USE_FAST_LED
 
 //https://forum.arduino.cc/t/single-line-define-to-disable-code/636044/4
 // Turn on/off Serial printing being included in the executable
@@ -40,21 +62,28 @@
 //code with #if (SERIAL_DEBUG_INFO) - or whatever level of printing
 //Use:  SerialError.print...
 #define SERIAL_DEBUG_ERROR true
-#define SerialError if (SERIAL_DEBUG_ERROR) Serial
+#define SerialError \
+  if (SERIAL_DEBUG_ERROR) Serial
 #define SERIAL_DEBUG_LOTS false
-#define SerialLots  if (SERIAL_DEBUG_LOTS) Serial
+#define SerialLots \
+  if (SERIAL_DEBUG_LOTS) Serial
 #define SERIAL_DEBUG_DEBUG true
-#define SerialDebug  if (SERIAL_DEBUG_DEBUG) Serial
+#define SerialDebug \
+  if (SERIAL_DEBUG_DEBUG) Serial
 #define SERIAL_DEBUG_INFO false
-#define SerialInfo  if (SERIAL_DEBUG_INFO) Serial
+#define SerialInfo \
+  if (SERIAL_DEBUG_INFO) Serial
 #define SERIAL_DEBUG_MINIMAL true
-#define SerialMin  if (SERIAL_DEBUG_MINIMAL) Serial
+#define SerialMin \
+  if (SERIAL_DEBUG_MINIMAL) Serial
 // a temporary debug.. without having to set the above..
 #define SERIAL_DEBUG_TEMP true
-#define SerialTemp  if (SERIAL_DEBUG_TEMP) Serial
+#define SerialTemp \
+  if (SERIAL_DEBUG_TEMP) Serial
 //turn on CALLS to see the methods called in order, etc
 #define SERIAL_DEBUG_CALL false
-#define SerialCall  if (SERIAL_DEBUG_CALL) Serial
+#define SerialCall \
+  if (SERIAL_DEBUG_CALL) Serial
 // *** REST ARE NORMAL INCLUDES based on these #defines ****
 
 #define NOTSET_STRING (char*)"notset"
@@ -70,22 +99,23 @@
 #include <M5Core2.h>
 #else
 //fix this... 4.25.24
-#ifdef  M5STICKCPLUS2
+#ifdef M5STICKCPLUS2
 #include <M5StickCPlus2.h>
 #else
 //! 8.30.24 add M5AtomS3
 #ifdef ESP_M5_ATOM_S3
-#include <M5AtomS3.h>
+//#include <M5AtomS3.h>
 #else
-#include <M5StickCPlus.h>
+#include "M5Unified.h"
+//#include <M5StickCPlus.h>
 #endif
 #endif
 
 //! see https://github.com/m5stack/M5Stack/issues/97
 #undef min
-#endif //M5Core2
+#endif  //M5Core2
 #else
-#include <Arduino.h>
+//#include <Arduino.h>
 #endif
 
 
@@ -103,4 +133,4 @@
 #include "src/MQTTModule/OTAImageUpdate.h"
 #endif
 
-#endif // Defines_h
+#endif  // Defines_h

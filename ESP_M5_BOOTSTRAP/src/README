@@ -1,0 +1,10 @@
+
+
+https://dl.espressif.com/dl/package_esp32_index.json,
+wget https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
+
+Going to switch to:
+
+wget https://static-cdn.m5stack.com/resource/arduino/package_m5stack_index.json 
+
+

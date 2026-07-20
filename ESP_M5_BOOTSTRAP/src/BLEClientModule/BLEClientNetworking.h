@@ -4,11 +4,14 @@
 //
 //  Created by Scott Moody on 11/21/25.
 //
-#ifndef BLETest_h
-#define BLETest_h
+#ifndef BLEClientNetworking_h
+#define BLEClientNetworking_h
 #include "../../Defines.h"
 
-void setup_BLETest();
-void loop_BLETest();
+void setup_BLEClientNetworking();
+void loop_BLEClientNetworking();
+
+//! send command like  feed or JSON
+void sendCommand(char* cmd);
 
 #endif

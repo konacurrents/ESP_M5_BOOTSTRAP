@@ -23,4 +23,7 @@ typedef struct  {
 //! get the pin use array
 PinUseStruct getPinUseStruct_mainModule();
 
+//! test for sending a FEED message
+void sendCommand_main(char* cmd);
+
 #endif

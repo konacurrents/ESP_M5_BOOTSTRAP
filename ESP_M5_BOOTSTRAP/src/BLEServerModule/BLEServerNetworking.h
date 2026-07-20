@@ -5,11 +5,14 @@
 //  Created by Scott Moody on 6/7/26.
 //
 
-#ifndef BLEServerNewtorking_h
-#define BLEServerNewtorking_h
+#ifndef BLEServerNetworking_h
+#define BLEServerNetworking_h
 #include "../../Defines.h"
 
-void setup_BLEServerNetworking();
+
+//!the 'setup' for this module BLEServerNetworking. Here the service name is added (and potentially more later)
+void setup_BLEServerNetworking(char *serviceName, char * deviceName, char *serviceUUID, char *characteristicUUID);
+
 void loop_BLEServerNetworking();
 
 #endif

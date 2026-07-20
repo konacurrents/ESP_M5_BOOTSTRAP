@@ -41,6 +41,7 @@
 			explicitFileTypes = {
 				Defines.h = sourcecode.c.h;
 				ESP_M5_BOOTSTRAP.ino = sourcecode.cpp.cpp;
+				src/BLEClientModule/BLEClientNetworking.cpp = sourcecode.cpp.cpp;
 			};
 			path = ESP_M5_BOOTSTRAP;
 			sourceTree = "<group>";
@@ -110,6 +111,7 @@
 				TargetAttributes = {
 					D265DD722E04AE640009B7AA = {
 						CreatedOnToolsVersion = 16.4;
+						LastSwiftMigration = 1640;
 					};
 				};
 			};
@@ -263,20 +265,25 @@
 		D265DD7B2E04AE640009B7AA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HZK48LWF33;
 				ENABLE_HARDENED_RUNTIME = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
 		D265DD7C2E04AE640009B7AA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HZK48LWF33;
 				ENABLE_HARDENED_RUNTIME = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
