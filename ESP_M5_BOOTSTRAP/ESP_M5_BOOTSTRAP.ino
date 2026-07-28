@@ -8,7 +8,7 @@
 void loop() {
 #ifdef ESP_M5_ATOM_S3
   AtomS3.update();
-#else''
+#else
     M5.update();
 #endif
 
@@ -43,6 +43,7 @@ void loop() {
         SerialDebug.println("MainModule **** wasReleased ***");
         //longLongPress_MainModule = true;
     }
+#ifdef M5UNIFIED
      if (M5.BtnA.wasClicked())
     {
         //        buttonA_longPress_MainModule();
@@ -55,6 +56,8 @@ void loop() {
         SerialDebug.println("MainModule **** wasHold ***");
         //longLongPress_MainModule = true;
     }
+#endif
+
     if (M5.BtnA.wasReleasefor(4500))
     {
         //        buttonA_longPress_MainModule();

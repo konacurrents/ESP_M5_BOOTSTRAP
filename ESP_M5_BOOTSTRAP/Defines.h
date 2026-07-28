@@ -10,12 +10,12 @@
 #define Defines_h
 
 //! ******* UPDATE THESE ********
-//#define SSID_NAME "SunnyWhiteriver"
-//#define SSID_PASSWORD "sunny2021"
+#define SSID_NAME "SunnyWhiteriver"
+#define SSID_PASSWORD "sunny2021"
 //#define SSID_NAME "Verizon-RC400L-A0"
 //#define SSID_PASSWORD "5e3ee45e"
-#define SSID_NAME "NeutraKuhns"
-#define SSID_PASSWORD "NeutraKuhns818"
+//#define SSID_NAME "NeutraKuhns"
+//#define SSID_PASSWORD "NeutraKuhns818"
 
 
 //!Defines the name of the service of the server, which for M5 will be PTClicker
@@ -30,11 +30,19 @@
 //go back for 7.13.26  
 //#define ESP_M5_ATOM_S3
 #ifdef ESP_M5_ATOM_S3
-//#include "M5Unified.h"
+
+#ifdef M5UNIFIED
+#include "M5Unified.h"
+#else
 #include "M5AtomS3.h"
+#endif
 
 #define PARTITION_SCHEME (char*)"Board=M5AtomS3 Unified,P= 8mb (3MB App 1.5 SPIFFS with OTA)"
 //#define PARTITION_SCHEME (char*)"Board=M5AtomS3 Unified,P=1.9MB App Minimal SPIFFS with OTA"
+
+#else
+#define PARTITION_SCHEME (char*)"Board=M5StickCPlus P=1.9MB App Minimal SPIFFS with OTA"
+
 #endif
 
 
@@ -106,8 +114,13 @@
 #ifdef ESP_M5_ATOM_S3
 //#include <M5AtomS3.h>
 #else
+
+#ifdef M5UNIFIED
 #include "M5Unified.h"
-//#include <M5StickCPlus.h>
+#else
+#include <M5StickCPlus.h>
+#endif
+
 #endif
 #endif
 
@@ -127,6 +140,10 @@
 
 #include "src/MainModule/MainModule.h"
 #include "src/JSONModule/JSON_Module.h"
+#include "src/WIFI_APModule/WIFI_APModule.h"
+
+//! use the library (not our codee)
+#define USE_LIB_WEBSERVER // is the library
 
 #ifdef USE_MQTT_NETWORKING
 //#include "src/MQTTModule/MQTTNetworking.h"

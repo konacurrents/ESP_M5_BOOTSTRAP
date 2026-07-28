@@ -19,6 +19,10 @@
 #define PT_SERVICE_UUID        "b0e6a4bf-cccc-ffff-330c-0000000000f0"  //Pet Tutor feeder service for feed  NOTE: Lower case for GEN3 compatability
 #define PT_CHARACTERISTIC_UUID "b0e6a4bf-cccc-ffff-330c-0000000000f1"  //Pet Tutor feeder characteristic  NOTE: Lower case for GEN3 compatability
 
+//!added 7.28.26 (AWS server down again..)
+// apmode"
+boolean _apmode_flag = false;
+    
 //! 7.21.25
 #include "../Time/NTPClient.h"
 #include <WiFiUdp.h>
@@ -414,6 +418,11 @@ void showPinUse()
 //! main loop
 void loop_mainModule()
 {
+    //! 7.28.26
+    //!added 7.28.26 (AWS server down again..)
+    if (_apmode_flag)
+        loop_WIFI_APModule();
+    
     //! 11.21.25 try the BLETest
     //! for 3.x Unified, and 2.x BLE
     loop_BLEClientNetworking();
@@ -543,6 +552,10 @@ void loop_mainModule()
 
             SerialDebug.println();
             SerialDebug.println(" *** STATUS ***");
+            
+            //!added 7.28.26 (AWS server down again..)
+            SerialDebug.println();
+            SerialDebug.println("   apmode -- turn on the AP mode");
             
             get_WIFIInfoString();
             
@@ -743,10 +756,20 @@ void loop_mainModule()
         {
             SerialDebug.printf("TBD: Build for %s\n", command);;
         }
+        //!added 7.28.26 (AWS server down again..)
+        else if (command.startsWith("apmode"))
+        {
+            _apmode_flag = true;
+            preSetup_WIFI_APModule();
+            setup_WIFI_APModule();
+        }
+        
         else
         {
             SerialDebug.printf("*** Unnown Command: %s\n", command);
         }
+        
+        
     }
 }
 

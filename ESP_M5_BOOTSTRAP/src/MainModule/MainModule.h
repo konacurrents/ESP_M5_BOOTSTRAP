@@ -26,4 +26,7 @@ PinUseStruct getPinUseStruct_mainModule();
 //! test for sending a FEED message
 void sendCommand_main(char* cmd);
 
+//gets unix time..
+int getTimeStamp_mainModule();
+
 #endif
