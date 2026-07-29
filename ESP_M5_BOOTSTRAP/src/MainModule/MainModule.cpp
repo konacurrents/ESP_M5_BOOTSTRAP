@@ -16,6 +16,9 @@
 #include "../M5ChainModule/M5ChainTest.h"
 
 
+//! preferences 7.29.26 for the FIRST TIME
+#include "PreferencesController.h"
+
 #define PT_SERVICE_UUID        "b0e6a4bf-cccc-ffff-330c-0000000000f0"  //Pet Tutor feeder service for feed  NOTE: Lower case for GEN3 compatability
 #define PT_CHARACTERISTIC_UUID "b0e6a4bf-cccc-ffff-330c-0000000000f1"  //Pet Tutor feeder characteristic  NOTE: Lower case for GEN3 compatability
 
@@ -183,6 +186,7 @@ void cycleColorIndex()
     
 }
 
+#ifdef MOVED_TO_PREF
 //!the EPROM is in preferences.h
 #include <Preferences.h>
 //!name of main prefs eprom
@@ -220,6 +224,7 @@ char * getPreference(char* preferenceID)
     _preferencesMainModule.end();
     return _preferenceBuffer;
 }
+#endif
 
 //! placeholders
 char *getDeviceNameMQTT()
@@ -245,14 +250,14 @@ char *getServerServiceName_mainModule()
 
 void setup_mainModule()
 {
-#ifdef ESP_M5_ATOM_S3
-//    auto cfg = M5.config();
-//    AtomS3.begin(cfg);
-#else
-    //! start the M5
-      M5.begin();
+	 //!read the preferences from EPROM
+    readPreferences_mainModule();
 
-#endif
+	 //! set the FIRST time.
+//	 PREFERENCE_FIRST_TIME_FEATURE_SETTING 22
+    savePreferenceBoolean_mainModule(PREFERENCE_FIRST_TIME_FEATURE_SETTING, true);
+
+
    
     //! for drawPix etc
     setup_M5Display();
@@ -819,4 +824,25 @@ void registerPinUse_mainModule(long pin, String pinName, String moduleName, bool
     }
     
     SerialDebug.printf("** PIN_USE: %s = %d, module=%s %s\n", pinName.c_str(), pin, moduleName.c_str(), isI2C?"(I2C)":"");
+}
+
+
+//!If nil it create one with just the null, so strlen = 0
+//!NOTE: the strdup() might be used later..
+char* createCopy(char * stringA)
+{
+    if (stringA)
+        return strdup(stringA);
+    else
+        return strdup("");
+}
+
+//!If nil it create one with just the null, so strlen = 0
+//!NOTE: the strdup() might be used later..
+char* createCopy2(const char * stringA)
+{
+    if (stringA)
+        return strdup(stringA);
+    else
+        return strdup("");
 }

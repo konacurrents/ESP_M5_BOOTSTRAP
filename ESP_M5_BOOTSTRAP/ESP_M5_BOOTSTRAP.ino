@@ -18,6 +18,7 @@ void loop() {
 
 //#ifdef NOT_HERE
 
+    M5.update();
 #ifdef ESP_M5_ATOM_S3
   if (AtomS3.BtnA.wasPressed()) {
 
@@ -31,13 +32,13 @@ void loop() {
     
     //!NOTE: ths issue is the timer is interruped by the scanner.. so make long-long very long..
     //was 1000  (from 500)
-    if (M5.BtnA.wasPressed())
+    if (M5.BtnB.wasPressed())
     {
         //        buttonA_longPress_MainModule();
         SerialDebug.println("MainModule **** wasPressed ***");
         //longLongPress_MainModule = true;
     }
-     if (M5.BtnA.wasReleased())
+     if (M5.BtnB.wasReleased())
     {
         //        buttonA_longPress_MainModule();
         SerialDebug.println("MainModule **** wasReleased ***");
@@ -93,16 +94,18 @@ void loop() {
 }
 
 void setup() {
-  Serial.begin(115200);
-  SerialDebug.println("*** setup ****");
-  SerialDebug.println(VERSION);
-
+    
+    
 #ifdef ESP_M5_ATOM_S3
-  AtomS3.begin();
+    AtomS3.begin();
 #else
     M5.begin();
 #endif
-
-  //! setup
-  setup_mainModule();
+    
+    Serial.begin(115200);
+    SerialDebug.println("*** setup ****");
+    SerialDebug.println(VERSION);
+    
+    //! setup
+    setup_mainModule();
 }
