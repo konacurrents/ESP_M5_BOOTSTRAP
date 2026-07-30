@@ -16,13 +16,6 @@
 #define NEW_BLE_CODE_2_x
 #ifdef NEW_BLE_CODE_2_x
 
-//#define USE_FAST_LED
-//! 7.24.25 Hot Day, Ballon last night, Mt Out
-//! for the 'C' option of atom color
-#ifdef USE_FAST_LED
-#include "../ATOM_LED_Module/M5Display.h"
-#include "../ATOM_LED_Module/LED_DisPlay.h"
-#endif
 
 #include <NimBLEDevice.h>
 

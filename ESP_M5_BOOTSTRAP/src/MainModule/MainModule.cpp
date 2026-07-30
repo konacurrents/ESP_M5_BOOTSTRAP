@@ -1,6 +1,5 @@
 #include "MainModule.h"
 
-#include "../ATOM_LED_Module/M5Display.h"
 
 #include <string>
 //#include <HTTPClient.h>
@@ -11,9 +10,6 @@
 #include "../BLEClientModule/BLEClientNetworking.h"
 //! 6.7.26 server
 #include "../BLEServerModule/BLEServerNetworking.h"
-
-//! 12.4.25 M5Chain
-#include "../M5ChainModule/M5ChainTest.h"
 
 
 //! preferences 7.29.26 for the FIRST TIME
@@ -332,21 +328,7 @@ void setup_mainModule()
     //! 7.30.26 set stuff...
     setConfiguration_mainModule((char*)"PTStepper");
 
-   
-    //! for drawPix etc
-    setup_M5Display();
-    
-#ifdef NO_CHAIN_TeST
-#ifdef ESP_M5_ATOM_S3
-    //! added back with right pins .. 7.12.26
-    setup_M5ChainTest();
 
-#else
-    //! 12.4.25 M5Chain
-    setup_M5ChainTest();
-#endif
-#endif
-    
 #pragma mark BLEServer
     //! 11.21.25 try the BLETest
     //! 10.10.25 #405 #406
@@ -517,13 +499,6 @@ void loop_mainModule()
         sendCommand(_commandToSend);
     }
    
-    
-#ifdef ESP_M5_ATOM_S3
-    //! added back with right pins .. 7.12.26
-
-    //! 12.4.25 M5Chain
-    loop_M5ChainTest();
-#endif
     
     if (_ntpServerInit)
     {
