@@ -248,6 +248,78 @@ char *getServerServiceName_mainModule()
         return MAIN_BLE_SERVER_SERVICE_NAME_PTClicker;
 }
 
+
+//! Only 1 setSensorsString now .. will always append
+//! unless a null or blank "" string
+//! set a sensor val (array of  sensor,pin,pin,sensor,pin,pin...)
+void setSensorsString_mainModule(char *sensorsString)
+{
+    //! store in EPROM
+    savePreference_mainModule(PREFERENCE_SENSORS_SETTING, sensorsString);
+}\
+//! 7.30.26 setup some things
+//! 8.20.25 Horses grazing if field first time for Mark and Bud
+//! add set/config
+//! PTStepper
+//! M5AtomCamera
+void setConfiguration_mainModule(char* configurationName)
+{
+    SerialDebug.printf("setConfiguration: %s\n", configurationName);
+    if (strcmp(configurationName, "PTStepper")==0)
+    {
+        //! poweroff
+        SerialDebug.println("Default PTStepperClass");
+        //resetSensorToDefault_mainModule();
+        //! 7.30.25 changing to the HDriver's board
+        //!     savePreference_mainModule(PREFERENCE_SENSORS_SETTING, _sensorsEPROM);
+#ifdef DONT_ADD_TO_SENSORS
+        setSensorsString_mainModule((char*)"BuzzerSensorClass,21,25,PTStepperClass,23,33");
+#else
+#ifdef ESP_M5_ATOM_S3
+        //! 7.12.26 Ashton's 12th birtyday, Bike ride 20
+        //! seems the AtomS3 blows UP with 19,22
+        //! now they are 39, 38
+        setSensorsString_mainModule((char*)"BuzzerSensorClass,39,38");
+        
+#else
+        //   setSensorsString_mainModule((char*)"BuzzerSensorClass,21,25");
+        //! try -1 and 21 ...
+        //! 7.14.26 warm day, fluffing up hay in field
+        
+        setSensorsString_mainModule((char*)"BuzzerSensorClass,-1,21");
+      
+#endif
+        
+#endif
+        //! 7.31.25 if Scanner or QR then pin 22 used .. so make M5HDriver (basically don't have a sensor)
+        savePreference_mainModule(PREFERENCE_ATOM_KIND_SETTING, "M5HDriver");
+        //! also specify the sensor plug
+        savePreference_mainModule(PREFERENCE_SENSOR_PLUGS_SETTING, "PTStepperClass");
+        //! for Tumbler .. use 200
+        savePreferenceFloat_mainModule(PREFERENCE_STEPPER_ANGLE_FLOAT_SETTING, 250.0);
+        //! @see #390 this is the RPM of the stepper
+        //savePreferenceFloat_mainModule(PREFERENCE_STEPPER_RPM_SETTING, 15.0);
+        //! set autoRotoate as well..
+        savePreferenceBoolean_mainModule(PREFERENCE_STEPPER_AUTO_MOTOR_DIRECTION_SETTING, true);
+        //! tumbler
+        savePreferenceInt_mainModule(PREFERENCE_STEPPER_KIND_VALUE, STEPPER_IS_TUMBLER);
+        
+        //! 9.5.25 set the 2step OFF for now
+        savePreferenceBoolean_mainModule(PREFERENCE_STEPPER_2FEED_SETTING, false);
+        
+        //! 10.24.25 also set BLE client and serve on,
+        //! RAIN .. atosmopheric river
+        //savePreferenceBoolean_mainModule(PREFERENCE_MAIN_BLE_CLIENT_VALUE, true);
+        savePreferenceBoolean_mainModule(PREFERENCE_MAIN_BLE_SERVER_VALUE, true);
+        
+        //!if set, the BLE Server (like PTFeeder) will tack on the device name (or none if not defined).
+        savePreferenceBoolean_mainModule(PREFERENCE_BLE_SERVER_USE_DEVICE_NAME_SETTING,true);
+        
+        //! reboot .. so the sensors are set..
+        //rebootDevice_mainModule();
+    }
+}
+
 void setup_mainModule()
 {
 	 //!read the preferences from EPROM
@@ -256,12 +328,15 @@ void setup_mainModule()
 	 //! set the FIRST time.
 //	 PREFERENCE_FIRST_TIME_FEATURE_SETTING 22
     savePreferenceBoolean_mainModule(PREFERENCE_FIRST_TIME_FEATURE_SETTING, true);
-
+    
+    //! 7.30.26 set stuff...
+    setConfiguration_mainModule((char*)"PTStepper");
 
    
     //! for drawPix etc
     setup_M5Display();
     
+#ifdef NO_CHAIN_TeST
 #ifdef ESP_M5_ATOM_S3
     //! added back with right pins .. 7.12.26
     setup_M5ChainTest();
@@ -269,6 +344,7 @@ void setup_mainModule()
 #else
     //! 12.4.25 M5Chain
     setup_M5ChainTest();
+#endif
 #endif
     
 #pragma mark BLEServer
