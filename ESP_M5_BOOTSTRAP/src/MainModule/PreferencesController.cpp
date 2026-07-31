@@ -1128,7 +1128,7 @@ void initPreferencesMainModule()
             case PREFERENCE_SENSORS_SETTING:
                 _preferenceMainModuleLookupEPROMNames[i] =
                 (char*)EPROM_SENSORS_SETTING;
-                _preferenceMainModuleLookupDefaults[i] = (char*)"BuzzerSensorClass,23,33,L9110S_DCStepperClass,21,25";
+                _preferenceMainModuleLookupDefaults[i] = (char*)"BuzzerSensorClass,-1,39,L9110S_DCStepperClass,21,25";
                 break;
               
                 

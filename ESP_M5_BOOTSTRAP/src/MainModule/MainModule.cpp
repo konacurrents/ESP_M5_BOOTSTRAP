@@ -61,6 +61,36 @@ void tryConnect();
  
  */
 
+//! 7.31.26 test the buzzer
+//! use option '-'
+//! then B for buzzer
+bool _testBuzzer = false;
+bool _buzzerSetup = false;
+int _pin2 = 39; // on m5AtomS3
+void setupBuzzer()
+{
+    _buzzerSetup = true;
+    SerialDebug.printf("setupBuzzer pin2 = %d\n", _pin2);
+
+    //! willl be the new PWR version
+    pinMode(_pin2, OUTPUT);
+    
+    // Active-low buzzer (connected between 3.3V and GPIO21)
+    digitalWrite(_pin2, HIGH);  // OFF
+}
+void doBuzzer()
+{
+    if (!_buzzerSetup)
+        setupBuzzer();
+    
+    SerialDebug.printf("doBuzzer pin2 = %d\n", _pin2);
+    // Turn buzzer ON
+    digitalWrite(_pin2, LOW);
+    delay(100);
+    // Turn buzzer OFF
+    digitalWrite(_pin2, HIGH);
+}
+
 bool _sendCommand = false;
 char _commandToSend[500];
 
@@ -274,9 +304,10 @@ void setConfiguration_mainModule(char* configurationName)
 #ifdef ESP_M5_ATOM_S3
         //! 7.12.26 Ashton's 12th birtyday, Bike ride 20
         //! seems the AtomS3 blows UP with 19,22
-        //! now they are 39, 38
-        setSensorsString_mainModule((char*)"BuzzerSensorClass,39,38");
-        
+        //! now they are 39, 38  ... oops this is old too..
+        //setSensorsString_mainModule((char*)"BuzzerSensorClass,39,38");
+        setSensorsString_mainModule((char*)"BuzzerSensorClass,-1,39");
+
 #else
         //   setSensorsString_mainModule((char*)"BuzzerSensorClass,21,25");
         //! try -1 and 21 ...
@@ -318,6 +349,9 @@ void setConfiguration_mainModule(char* configurationName)
 
 void setup_mainModule()
 {
+    //! init buzzer .. off
+    setupBuzzer();
+    
 	 //!read the preferences from EPROM
     readPreferences_mainModule();
 
@@ -521,6 +555,8 @@ void loop_mainModule()
     if (M5.BtnA.wasPressed()) {
         
         Serial.println("Pressed");
+        if (_testBuzzer)
+            doBuzzer();
     }
     if (M5.BtnA.wasReleased()) {
         
@@ -548,7 +584,7 @@ void loop_mainModule()
         // read string until meet newline character
         String command = Serial.readStringUntil('\n');
         
-        SerialDebug.println(command);
+        SerialDebug.printf("Command = '%s'\n",command);
         
         if (command == "help" || command == ".")
         {
@@ -627,6 +663,11 @@ void loop_mainModule()
             //!added 7.28.26 (AWS server down again..)
             SerialDebug.println();
             SerialDebug.println("   apmode -- turn on the AP mode");
+            
+            SerialDebug.println();
+            SerialDebug.println("   B -- turn on the buzzer mode");
+            SerialDebug.println("   b -- turn off the buzzer mode");
+
             
             get_WIFIInfoString();
             
@@ -707,7 +748,7 @@ void loop_mainModule()
             //! try connecting
             tryConnect();
         }
-        else if (command == "bootstrap")
+        else if (command.startsWith("bootstrap"))
         {
             SerialDebug.println(" *** performing OTA Update of this BOOTSTRAP program");
             
@@ -833,6 +874,18 @@ void loop_mainModule()
             _apmode_flag = true;
             preSetup_WIFI_APModule();
             setup_WIFI_APModule();
+        }
+        
+        //! buzzer  7.31.26
+        else if (command.startsWith("B"))
+        {
+            _testBuzzer = true;
+            doBuzzer();
+        }
+        //! buzzer
+        else if (command.startsWith("b"))
+        {
+            _testBuzzer = false;
         }
         
         else
