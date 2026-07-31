@@ -15,6 +15,8 @@
  */
 #include "BLEServerNetworking.h"
 
+#ifdef NOT_FOR_BOOTSTRAP
+
 #include <NimBLEDevice.h>
 #ifdef M5UNIFIED
 
@@ -745,6 +747,20 @@ void setup_BLEServerNetworking(char *serviceName, char * deviceName, char *servi
 }
 
 
+
+#endif
+
+#else
+
+//!the 'setup' for this module BLEServerNetworking. Here the service name is added (and potentially more later)
+void setup_BLEServerNetworking(char *serviceName, char * deviceName, char *serviceUUID, char *characteristicUUID)
+{
+    
+}
+
+void loop_BLEServerNetworking()
+{
+}
 
 #endif
 

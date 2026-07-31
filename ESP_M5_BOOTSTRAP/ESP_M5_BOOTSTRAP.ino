@@ -7,7 +7,11 @@
 
 void loop() {
 #ifdef ESP_M5_ATOM_S3
+#ifdef M5UNIFIED
+  M5.update();
+#else
   AtomS3.update();
+  #endif
 #else
     M5.update();
 #endif
@@ -20,7 +24,19 @@ void loop() {
 
     M5.update();
 #ifdef ESP_M5_ATOM_S3
-  if (AtomS3.BtnA.wasPressed()) {
+
+#ifdef M5UNIFIED
+ 
+if (M5.BtnA.wasPressed()) {
+
+    Serial.println("Pressed");
+  }
+  if (M5.BtnA.wasReleased()) {
+
+    Serial.println("Released");
+  }
+#else
+ if (AtomS3.BtnA.wasPressed()) {
 
     Serial.println("Pressed");
   }
@@ -28,6 +44,7 @@ void loop() {
 
     Serial.println("Released");
   }
+#endif //M5UNIFIED
 #else
     
     //!NOTE: ths issue is the timer is interruped by the scanner.. so make long-long very long..
@@ -97,7 +114,11 @@ void setup() {
     
     
 #ifdef ESP_M5_ATOM_S3
+#ifdef M5UNIFIED
+    M5.begin();
+#else
     AtomS3.begin();
+#endif
 #else
     M5.begin();
 #endif

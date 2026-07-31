@@ -185,7 +185,7 @@ boolean isSet_SSID_WIFICredentials()
 //!returns true if the SSID is set, false otherwise. If set, then just exit..
 void clean_SSID_WIFICredentials()
 {
-#ifdef M5UNIFIED
+#ifdef M5UNIFIED_NOT_HERE
     SerialDebug.println("clean_SSID_WIFICredentials");
     
     _WIFIPreferences.begin(AP_EPROM_NAME);

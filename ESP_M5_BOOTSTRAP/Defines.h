@@ -28,9 +28,9 @@
 
 //! 3.7.26 try for the S3
 //go back for 7.13.26  
-//#define ESP_M5_ATOM_S3
+#define ESP_M5_ATOM_S3
 #ifdef ESP_M5_ATOM_S3
-
+#define M5UNIFIED
 #ifdef M5UNIFIED
 #include "M5Unified.h"
 #else
@@ -51,8 +51,9 @@
 
 
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
+#define VERSION "v7_31_26(3.0b)-BOOTSTRAP_UNIFIED_BLE_2"
 
-#define VERSION "v6_8_26(3.0)-BOOTSTRAP_UNIFIED_BLE_2"
+//#define VERSION "v6_8_26(3.0)-BOOTSTRAP_UNIFIED_BLE_2"
 
 //#define VERSION "v12_04_25(2.5)-BOOTSTRAP_M5CHAIN_M5STICK_COLOR_JSON_OTA_NTP_56"
 
@@ -116,8 +117,10 @@
 #else
 
 #ifdef M5UNIFIED
+nothere
 #include "M5Unified.h"
 #else
+nothere
 #include <M5StickCPlus.h>
 #endif
 

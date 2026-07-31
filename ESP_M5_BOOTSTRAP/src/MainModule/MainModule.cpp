@@ -515,6 +515,20 @@ void loop_mainModule()
     }
     
 #ifdef ESP_M5_ATOM_S3
+    
+#ifdef M5UNIFIED
+    //! try the buttons here
+    if (M5.BtnA.wasPressed()) {
+        
+        Serial.println("Pressed");
+    }
+    if (M5.BtnA.wasReleased()) {
+        
+        Serial.println("Released");
+        sendCommand_main((char*)"{'cmd':'feed'}");
+        
+    }
+#else
     //! try the buttons here
     if (AtomS3.BtnA.wasPressed()) {
         
@@ -526,6 +540,7 @@ void loop_mainModule()
         sendCommand_main((char*)"{'cmd':'feed'}");
 
     }
+#endif
 #endif
     //! see if data on the serial input
     if (Serial.available())

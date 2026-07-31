@@ -13,7 +13,7 @@
 *      Author: H2zero
 */
 #include "BLEClientNetworking.h"
-#define NEW_BLE_CODE_2_x
+//#define NEW_BLE_CODE_2_x
 #ifdef NEW_BLE_CODE_2_x
 
 
@@ -726,10 +726,17 @@ void checkButtonB_MainModule()
 }
 #else
 
-void setup_BLETest() {
+void setup_BLEClientNetworking() {
    
 }
 
-void loop_BLETest() {
+void loop_BLEClientNetworking() {
 }
+    
+    
+    //! send command like  feed or JSON
+    void sendCommand(char* cmd)
+    {
+        
+    }
 #endif
