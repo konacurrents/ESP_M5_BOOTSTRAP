@@ -22,6 +22,75 @@
 // apmode"
 boolean _apmode_flag = false;
     
+
+#ifdef M5UNIFIED
+
+
+static constexpr const int colors[] = { TFT_WHITE, TFT_CYAN, TFT_RED, TFT_YELLOW, TFT_BLUE, TFT_GREEN };
+static constexpr const char* const names[] = { "none", "wasHold", "wasClicked", "wasPressed", "wasReleased", "wasDeciedCount" };
+
+
+long _randomColorIndex = 0;
+#define MAX_COLORS 6
+//! 7.24.25 return a (semi) random color
+int getRandomColor() {
+    _randomColorIndex = (++_randomColorIndex) % MAX_COLORS;
+    int color = TFT_BLUE;
+    switch (_randomColorIndex) {
+        case 0:
+            color = TFT_WHITE;
+            //Serial.println("TFT_WHITE");
+            break;
+        case 1:
+            color = TFT_CYAN;
+            //Serial.println("TFT_CYAN");
+            break;
+        case 2:
+            color = TFT_RED;
+            //Serial.println("TFT_RED");
+            break;
+        case 3:
+            color = TFT_YELLOW;
+            //Serial.println("TFT_YELLOW");
+            break;
+        case 4:
+            color = TFT_BLUE;
+            //Serial.println("TFT_BLUE");
+            break;
+            
+        default:
+        case 5:
+            color = TFT_GREEN;
+            //Serial.println("TFT_GREEN");
+            break;
+    }
+    //Serial.printf("COLOR = %d\n", color);
+    return color;
+}
+//! returns a string for the color int
+String getColorString(int color) {
+    String colorString = "TFT_RED";
+    switch (color) {
+        case TFT_WHITE: colorString = "TFT_WHITE"; break;
+        case TFT_CYAN: colorString = "TFT_CYAN"; break;
+        case TFT_RED: colorString = "TFT_RED"; break;
+        case TFT_YELLOW: colorString = "TFT_YELLOW"; break;
+        case TFT_BLUE: colorString = "TFT_BLUE"; break;
+            
+        default:
+        case TFT_GREEN: colorString = "TFT_GREEN"; break;
+    }
+    //Serial.printf("COLOR = %s\n", colorString);
+    return colorString;
+}
+
+//! uses the color numbers TFT_GREEN, etc
+void setLEDColor(int color) {
+    Serial.printf("setLEDColor(%s)\n", getColorString(color));
+    M5.Led.setAllColor(color);
+}
+#endif
+
 //! 7.21.25
 #include "../Time/NTPClient.h"
 #include <WiFiUdp.h>
@@ -349,6 +418,12 @@ void setConfiguration_mainModule(char* configurationName)
 
 void setup_mainModule()
 {
+    
+#ifdef M5UNIFIED
+    //! set color
+    setLEDColor(TFT_CYAN);
+#endif
+    
     //! init buzzer .. off
     setupBuzzer();
     
@@ -555,6 +630,8 @@ void loop_mainModule()
     if (M5.BtnA.wasPressed()) {
         
         Serial.println("Pressed");
+        setLEDColor(getRandomColor());
+        
         if (_testBuzzer)
             doBuzzer();
     }

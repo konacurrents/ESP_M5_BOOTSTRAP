@@ -32,7 +32,9 @@
 #ifdef ESP_M5_ATOM_S3
 #define M5UNIFIED
 #ifdef M5UNIFIED
-#include "M5Unified.h"
+//#include <M5AtomS3.h> //wont compile as it pulls in FastLEZD.h
+
+#include <M5Unified.h>
 #else
 #include "M5AtomS3.h"
 #endif
@@ -51,7 +53,7 @@
 
 
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
-#define VERSION "v7_31_26(3.0b)-BOOTSTRAP_UNIFIED_BLE_2"
+#define VERSION "v7_31_26(3.0b)-BOOTSTRAP_UNIFIED_M5STACK_3_3_8"
 
 //#define VERSION "v6_8_26(3.0)-BOOTSTRAP_UNIFIED_BLE_2"
 
