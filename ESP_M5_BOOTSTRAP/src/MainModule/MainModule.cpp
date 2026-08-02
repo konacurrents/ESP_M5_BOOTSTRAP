@@ -25,50 +25,43 @@ boolean _apmode_flag = false;
 
 #ifdef M5UNIFIED
 
-
-static constexpr const int colors[] = { TFT_WHITE, TFT_CYAN, TFT_RED, TFT_YELLOW, TFT_BLUE, TFT_GREEN };
-static constexpr const char* const names[] = { "none", "wasHold", "wasClicked", "wasPressed", "wasReleased", "wasDeciedCount" };
+//! these are the constanst for the colors
+// TFT_WHITE, TFT_CYAN, TFT_RED, TFT_YELLOW, TFT_BLUE, TFT_GREEN
 
 
 long _randomColorIndex = 0;
 #define MAX_COLORS 6
 //! 7.24.25 return a (semi) random color
-int getRandomColor() {
+int getRandomColorUnified() {
     _randomColorIndex = (++_randomColorIndex) % MAX_COLORS;
     int color = TFT_BLUE;
     switch (_randomColorIndex) {
         case 0:
             color = TFT_WHITE;
-            //Serial.println("TFT_WHITE");
             break;
         case 1:
             color = TFT_CYAN;
-            //Serial.println("TFT_CYAN");
             break;
         case 2:
             color = TFT_RED;
-            //Serial.println("TFT_RED");
             break;
         case 3:
             color = TFT_YELLOW;
-            //Serial.println("TFT_YELLOW");
             break;
         case 4:
             color = TFT_BLUE;
-            //Serial.println("TFT_BLUE");
             break;
             
         default:
         case 5:
             color = TFT_GREEN;
-            //Serial.println("TFT_GREEN");
             break;
     }
-    //Serial.printf("COLOR = %d\n", color);
     return color;
 }
 //! returns a string for the color int
-String getColorString(int color) {
+String getColorStringUnified(int color)
+{
     String colorString = "TFT_RED";
     switch (color) {
         case TFT_WHITE: colorString = "TFT_WHITE"; break;
@@ -80,16 +73,99 @@ String getColorString(int color) {
         default:
         case TFT_GREEN: colorString = "TFT_GREEN"; break;
     }
-    //Serial.printf("COLOR = %s\n", colorString);
     return colorString;
 }
-
+//!this is the M5UNIFIED version ...
 //! uses the color numbers TFT_GREEN, etc
-void setLEDColor(int color) {
-    Serial.printf("setLEDColor(%s)\n", getColorString(color));
+void setLEDColorUnified(int color)
+{
+    SerialDebug.printf("setLEDColorUnfied(%s)\n", getColorStringUnified(color));
     M5.Led.setAllColor(color);
 }
 #endif
+
+#ifdef M5UNIFIED
+//! 2 year breakthrough - 8.1.26
+//! create enum for our colors (so we user _RED  or TFT_RED
+typedef enum  {
+    RED_LED = TFT_RED,
+    BLUE_LED = TFT_BLUE,
+    GREEN_LED = TFT_GREEN,
+    CYAN_LED = TFT_CYAN,
+    YELLOW_LED = TFT_YELLOW,
+    WHITE_LED = TFT_WHITE
+} ColorsUnified;
+#else
+//! create enum for our colors (so we user _RED  or TFT_RED
+//! THis way the code works without knowning the TFT names..
+typedef enum  {
+    RED_LED,
+    BLUE_LED,
+    GREEN_LED,
+    CYAN_LED,
+    YELLOW_LED,
+    WHITE_LED
+} ColorsUnified;
+#endif
+
+//! 7.24.25 return a (semi) random color
+ColorsUnified getRandomColor()
+{
+    _randomColorIndex = (++_randomColorIndex) % MAX_COLORS;
+    ColorsUnified color = RED_LED;
+    switch (_randomColorIndex) {
+        case 0:
+            color = WHITE_LED;
+            break;
+        case 1:
+            color = CYAN_LED;
+            break;
+        case 2:
+            color = RED_LED;
+            break;
+        case 3:
+            color = YELLOW_LED;
+            break;
+        case 4:
+            color = BLUE_LED;
+            break;
+        default:
+        case 5:
+            color = GREEN_LED;
+            break;
+    }
+    return color;
+}
+//! returns a string for the color int
+String getColorString(ColorsUnified color)
+{
+    String colorString = "RED_LED";
+    switch (color) {
+        case RED_LED: colorString = "RED_LED"; break;
+        case BLUE_LED: colorString = "BLUE_LED"; break;
+        case GREEN_LED: colorString = "GREEN_LED"; break;
+        case YELLOW_LED: colorString = "YELLOW_LED"; break;
+        case CYAN_LED: colorString = "CYAN_LED"; break;
+            
+        default:
+        case WHITE_LED: colorString = "WHITE_LED"; break;
+    }
+    return colorString;
+}
+
+//! uses colors.. _GREEN to be typed values
+void setLEDColor(ColorsUnified color)
+{
+    SerialDebug.printf("setLEDColor(%s)\n", getColorString(color));
+#ifdef M5UNIFIED
+    // M5.Led.setAllColor(color);
+   setLEDColorUnified((int)color);
+#else
+    //! Anyone?
+    SerialDebug.printf("setLEDColor(%s) NOT IMPLEMENTED\n", getColorString(color));
+#endif
+
+}
 
 //! 7.21.25
 #include "../Time/NTPClient.h"
@@ -421,7 +497,10 @@ void setup_mainModule()
     
 #ifdef M5UNIFIED
     //! set color
-    setLEDColor(TFT_CYAN);
+    //setLEDColor(TFT_CYAN);
+    
+    setLEDColor(CYAN_LED);
+
 #endif
     
     //! init buzzer .. off
