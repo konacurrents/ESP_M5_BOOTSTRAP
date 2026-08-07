@@ -262,14 +262,14 @@ void preSetup_WIFI_APModule()
 void setup_WIFI_APModule() {
     
     SerialTemp.printf("setup_WIFI_APModule: isSet(%s)\n", isSet_SSID_WIFICredentials()?"set":"notSet");
-    
+#ifdef NOT_IN_BOOTSTRAP
     if (isSet_SSID_WIFICredentials())
     {
         //!Exit setup().  退出setup()
         setDoneWIFI_APModuleFlag(true);
         return;
     }
-    
+#endif
     //NOTE: here is where we would look for SSID set (if empty .. then continue). Not worrying about MQTT
     _WIFIPreferences.begin(AP_EPROM_NAME);
     delay(10);

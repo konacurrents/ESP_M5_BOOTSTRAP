@@ -1028,7 +1028,7 @@ void loop_mainModule()
         else if (command.startsWith("apmode"))
         {
             _apmode_flag = true;
-            preSetup_WIFI_APModule();
+            //preSetup_WIFI_APModule();
             setup_WIFI_APModule();
         }
         
