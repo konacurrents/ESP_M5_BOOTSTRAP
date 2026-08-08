@@ -10,6 +10,13 @@ compileM5Atom:
 
 # uploads this to the OTA/Bootstrap
 # This requires premission to upload to a foreign web location
-uploadBootstrap:
+uploadBootstrapPRE_UNIFIED:
 	scp -i ~/.ssh/idogwatch_001.pem ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin ec2-user@knowledgeshark.me:html/KnowledgeShark.org/OTA/Bootstrap
 	mv ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin.save
+
+# uploads this to the OTA/Bootstrap
+# This requires premission to upload to a foreign web location
+uploadBootstrap:
+	cp -p ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin .ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin.save
+	mv  build/m5stack.esp32.m5stack_atoms3/ESP_M5_BOOTSTRAP.ino.bin ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin
+	scp -i ~/.ssh/idogwatch_001.pem ESP_M5_BOOTSTRAP.ino.m5stack_stickc_plus.bin ec2-user@knowledgeshark.me:html/KnowledgeShark.org/OTA/Bootstrap
