@@ -4,6 +4,24 @@
   Author:	scott
 */
 #include "Defines.h"
+//#define useMAIN
+#ifdef  USE_PLATFORM_IO
+//! nothing .. it's all in src/main.cpp
+#else
+export void mainLoop();
+export void mainSetup();
+void loop()
+{
+    mainLoop();
+}
+void setup()
+{
+    mainSetup();
+}
+#endif
+
+//! moved to src/main.cpp
+#ifdef useMAIN
 
 void loop() {
 #ifdef ESP_M5_ATOM_S3
@@ -43,3 +61,5 @@ void setup() {
   //! setup
   setup_mainModule();
 }
+
+#endif

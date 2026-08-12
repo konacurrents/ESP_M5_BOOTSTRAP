@@ -9,6 +9,8 @@
 #ifndef Defines_h
 #define Defines_h
 
+//#define USE_PLATFORM_IO
+
 //! ******* UPDATE THESE ********
 #define SSID_NAME "SunnyWhiteriver"
 #define SSID_PASSWORD "sunny2021"
@@ -53,7 +55,8 @@
 
 
 //! ***** THIS IS MAIN "ATOM" ***** 3.29.25,  5.14.25   <<<<<<<<<<<< THIS ONE <<<<<<<<<<<<< M5Atom
-#define VERSION "v8_8_26(3.1)-BOOTSTRAP_AP_TEST_UNIFIED_M5STACK_3_3_8"
+#define VERSION "v8_12_26(3.1b)_OLD_WEB_BOOTSTRAP_AP_TEST_UNIFIED_M5STACK_3_3_8"
+//#define VERSION "v8_8_26(3.1)-BOOTSTRAP_AP_TEST_UNIFIED_M5STACK_3_3_8"
 
 //#define VERSION "v7_31_26(3.0b)-BOOTSTRAP_UNIFIED_M5STACK_3_3_8"
 
@@ -150,7 +153,7 @@ nothere
 #include "src/WIFI_APModule/WIFI_APModule.h"
 
 //! use the library (not our codee)
-#define USE_LIB_WEBSERVER // is the library
+//#define USE_LIB_WEBSERVER // is the library
 
 #ifdef USE_MQTT_NETWORKING
 //#include "src/MQTTModule/MQTTNetworking.h"

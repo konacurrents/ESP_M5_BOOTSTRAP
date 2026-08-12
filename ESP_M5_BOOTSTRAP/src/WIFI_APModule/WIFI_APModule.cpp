@@ -219,6 +219,13 @@ void cleanEPROM_WIFI_APModule()
 void WIFI_APModule_updateMQTTInfo(char *ssid, char *ssid_password, char *username, char *password, char *guestPassword, char *deviceName, char *host, char *port, char *locationString)
 {
     SerialDebug.printf("wifi_apModule.updateMQTTInfo(%s, %s, %s,%s, %s, %s, %s)\n", ssid?ssid:"NULL", ssid_password?ssid_password:"NULL", username?username:"NULL", password?password:"NULL", guestPassword?guestPassword:"NULL", locationString?locationString:"NULL", deviceName?deviceName:"NULL");
+    
+    //!@see https://github.com/HomeSpan/HomeSpan/discussions/1148#discussioncomment-16508830
+    //! 8.11.26 try disconnect before
+    //!Disconnect wifi connection.  断开wifi连接
+    SerialTemp.println("WIFI.disconnect");
+    WiFi.disconnect();
+    
     _WIFIPreferences.begin(AP_EPROM_NAME, false);  //readwrite..
     _WIFIPreferences.putString(WIFI_SSID, ssid);
     _WIFIPreferences.putString(WIFI_PASSWORD, ssid_password?ssid_password:"");
@@ -272,7 +279,7 @@ void setup_WIFI_APModule() {
 #endif
     //NOTE: here is where we would look for SSID set (if empty .. then continue). Not worrying about MQTT
     _WIFIPreferences.begin(AP_EPROM_NAME);
-    delay(10);
+    delay(200);
     
     //If there is no stored wifi configuration information, turn on the setting mode.  若没有已存储的wifi配置信息,则开启设置模式
     _WIFI_SettingMode = true;
@@ -293,6 +300,11 @@ void loop_WIFI_APModule() {
 void WIFI_startWebServer() 
 {
     SerialDebug.println("wifi_apModule.WIFI_startWebServer");
+#ifdef NOT_IN_BOOTSTRAP
+    //! 8.10.26 Turning OFF BLE client
+    SerialDebug.println(" *** Turning OFF BLE_Client ****");
+    savePreferenceBoolean_mainModule(PREFERENCE_MAIN_BLE_CLIENT_VALUE,false);
+#endif
     
     //If the setting mode is on.  如果设置模式处于开启状态
     if (_WIFI_SettingMode)
@@ -322,6 +334,8 @@ void WIFI_startWebServer()
         
         /********* ROOT == notFound *****************/
         WIFI_webServer.onNotFound([]() {
+            SerialDebug.println("WIFI_webServer.onNotFound");
+
 #ifdef DONT_USE_BASE_ADDRESS
             // String s = "<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=http://192.168.4.1/settings\">";
             
@@ -341,16 +355,17 @@ void WIFI_startWebServer()
 #endif
 
             //addToTextMessages_displayModule("AP Credentials");
-
-            SerialDebug.println("settings touched, ssid_last = ");
+            SerialDebug.println("Creating AP Credentials web page");
+            //! get the header string
             String s = headerImageString();
-            SerialDebug.println(s);
+            SerialLots.println(s);
             //!add the javascript
             s += getJavascriptString();
             
             //!this re-calculates the WIFI list
             rediscoverWIFIList();
 
+            SerialDebug.print("settings touched, ssid_last = ");
             SerialDebug.println(_WIFI_ssid_last);
 
 
@@ -440,8 +455,9 @@ s += "<button onClick=\"window.location.reload();\">Refresh to re-discover WIFI 
             //! invokes the web server with "feed" which will be the "/feed" below
             s += "<br><h2><a href=\"feed\">Feed your dog right now</a></h2>";
 #endif
-            
-//#define AP_DEBUG_MODE  (defined in Perferences..)
+    
+            //! 8.2.26 turn this on .. for debugging .. OR keep it on.
+#define AP_DEBUG_MODE  (defined in Perferences..)
 #ifdef  AP_DEBUG_MODE
             /********  APDebug ******************/
             
@@ -453,7 +469,7 @@ s += "<button onClick=\"window.location.reload();\">Refresh to re-discover WIFI 
             //! show some information...
             s += "\nVERSON = " + String(VERSION);
           //  s += "WIFI_CREDENTIAL_1:" +  getPreference_mainModule(PREFERENCE_WIFI_CREDENTIAL_1_SETTING)  + "\n";
-            
+#ifdef NOT_IN_BOOT
             //! 8.16.25 MQTT
             //! 9.16.23 some debug information
             //! retrieve the Configuration JSON string in JSON format..
@@ -465,7 +481,7 @@ s += "<button onClick=\"window.location.reload();\">Refresh to re-discover WIFI 
             
             //! empty it now.
             resetPreference_mainModule(PREFERENCE_DEBUG_INFO_SETTING);
-               
+#endif
 #endif
 
             
@@ -475,7 +491,7 @@ s += "<button onClick=\"window.location.reload();\">Refresh to re-discover WIFI 
         /******** /setap ******************/
         //call this when the 'submit' touched..s
         WIFI_webServer.on("/setap", []() {
-            SerialDebug.println("setAP touched");
+            SerialDebug.println("WIFI_webServer.on(/setap touched");
             
             //String ssid = removeSpaces(WIFI_urlDecode(WIFI_webServer.arg("ssid")));
             //! as per #248 support SSID syntax (first will remove the spaces at start and end)
@@ -579,7 +595,8 @@ s += "<button onClick=\"window.location.reload();\">Refresh to re-discover WIFI 
             s += "<br><a href=\"http://192.168.4.1\">Restart Credentials (after connecting to PetTutorSetup_192_168_4_1)</a>";
             WIFI_webServer.send(200, "text/html", WIFI_makePage("iDogWatch Page", s));
             //delay(2000);
-            delay(200); //??
+            //delay(200); //??
+            delay(10);
             
         });
 #ifdef M5_CAPTURE_SCREEN
@@ -606,7 +623,7 @@ s += "<button onClick=\"window.location.reload();\">Refresh to re-discover WIFI 
         /******** /feed ******************/
         WIFI_webServer.on("/feed", []() {
             
-            SerialDebug.println("feed touched");
+            SerialDebug.println("WIFI_webServer.on(/feed - feed touched");
             //!send a feed command 's'
             processClientCommandChar_mainModule('s');
 
@@ -636,7 +653,7 @@ void rediscoverWIFIList()
     int n = WiFi.scanNetworks();
     delay(100);
     SerialTemp.println(" *** WIFI LIST: ");
-#ifdef  AP_DEBUG_MODE
+#ifdef  AP_DEBUG_MODE_not_in_bootstrap
     //!try debug
     appendPreference_mainModule(PREFERENCE_DEBUG_INFO_SETTING, " *** WIFI DISCOVERED");
 
@@ -646,7 +663,7 @@ void rediscoverWIFIList()
     for (int i = 0; i < n; i++) {
         SerialTemp.print("SSID: ");
         SerialTemp.print(WiFi.SSID(i));
-#ifdef  AP_DEBUG_MODE
+#ifdef  AP_DEBUG_MODE_not_in_boostrap
         //!try debug
         appendPreference_mainModule(PREFERENCE_DEBUG_INFO_SETTING, WiFi.SSID(i));
 #endif
@@ -710,14 +727,28 @@ String WIFI_makePage(String title, String contents) {
     
     SerialDebug.print("WIFI_makePage:");
     SerialDebug.println(title);
-    SerialDebug.printf("*** Contents = %s\n", contents);
+    SerialTemp.printf("1.Length = %d\n", contents.length());
+
     String s = "<!DOCTYPE html><html><head>";
-    s += "<meta name=\"viewport\" content=\"width=device-width,user-scalable=0\">";
+    //s += "<meta name=\"viewport\" content=\"width=device-width,user-scalable=0\">";
+    s += "<meta name=\"viewport\" content=\"width=device-width,user-scalable=0\"";
+
+    s += " HTTP-EQUIV=\"REFRESH\" url=\"http://192.168.4.1\">";
+
     s += "<title>";
     s += title;
     s += "</title></head><body>";
     s += contents;
     s += "</body></html>";
+    SerialTemp.println(s);
+    SerialTemp.printf("2.Length = %d\n", s.length());
+    //! see what's up..
+    if (s.length() < contents.length())
+    {
+        SerialError.println(" ***** Length shrunk .. bad C++ string concat **");
+        s = "ERROR RENDERING WEB PAGE .. please try again and also let developers know";
+    }
+
     return s;
 }
 
@@ -761,10 +792,11 @@ String WIFI_urlDecode(String input) {
 String headerImageString()
 {
     //#include "idogwatch.base64"
-#define DOIT_IMAGE // 7.26.26 put back .. lots of room
+#define DOIT_IMAGE_not_working // 7.26.26 put back .. lots of room
 #ifdef DOIT_IMAGE
 //#ifdef ESP_M5_ATOM_S3
     //! 7.16.26 Stormy day, seems the memory (89%) and heap are full so this dynamic string is garbage ..
+    //! 8..2.26 seems to be break the s += (length big, then small .. breaks the CString concat)
 
     String imageString = "<img width=\"200\" src=\"data:image/png;base64,";
     imageString +=
